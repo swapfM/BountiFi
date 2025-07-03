@@ -4,8 +4,8 @@ from sqlalchemy import Column, Integer, String
 from .database import Base
 
 class UserType(enum.Enum):
-    ORGANIZATION = "organization"
-    HUNTER = "hunter"
+    ORGANIZATION = "ORGANIZATION"
+    HUNTER = "HUNTER"
 
 class User(Base):
     __tablename__ = "users"
@@ -14,3 +14,6 @@ class User(Base):
     name = Column(String)
     password = Column(String)
     user_type = Column(Enum(UserType)) 
+
+    def __repr__(self):
+        return f"<User(email={self.email}, name={self.name}, user_type={self.user_type})>"

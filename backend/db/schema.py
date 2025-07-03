@@ -7,11 +7,11 @@ class User_Create(BaseModel):
     user_type: str  
 
     class Config:
-        orm_mode = True  
+        from_attributes = True
 
 class User_Login(BaseModel):
     email: str
     password: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
