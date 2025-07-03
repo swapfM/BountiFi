@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class User(BaseModel):
+class User_Create(BaseModel):
     email: str
     name: str
     password: str
@@ -8,3 +8,10 @@ class User(BaseModel):
 
     class Config:
         orm_mode = True  
+
+class User_Login(BaseModel):
+    email: str
+    password: str
+
+    class Config:
+        orm_mode = True
