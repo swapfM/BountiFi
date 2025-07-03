@@ -62,7 +62,7 @@ async def create_user(db: Session, user: schema.User_Create):
         access_token = create_access_token(data={"email": db_user.email})
         return {
             "name": db_user.name,
-            "user_type": db_user.user_type,
+            "user_type": db_user.user_type.value,
             "access_token": access_token,
         }
     except Exception as e:
@@ -83,7 +83,7 @@ async def login_user(db: Session, user: schema.User_Login):
 
         return {
             "name": db_user.name,
-            "user_type": db_user.user_type,
+            "user_type": db_user.user_type.value,
             "access_token": access_token,
         }
     except Exception as e:

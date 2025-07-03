@@ -22,7 +22,7 @@ class User_Login(BaseModel):
 
 class User_Response(BaseModel):
     name: str
-    user_type: Literal["HUNTER", "ORGANIZATION"]
+    user_type: Literal["ORGANIZATION", "HUNTER"]
     access_token: str
 
     class Config:
