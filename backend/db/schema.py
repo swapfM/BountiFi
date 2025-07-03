@@ -1,17 +1,29 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
+from typing import Literal
+
 
 class User_Create(BaseModel):
-    email: str
-    name: str
-    password: str
-    user_type: str  
+    email: EmailStr
+    name: str = Field(..., min_length=1, max_length=100)
+    password: str = Field(..., min_length=5)
+    user_type: Literal["HUNTER", "ORGANIZATION"]
 
     class Config:
         from_attributes = True
 
+
 class User_Login(BaseModel):
-    email: str
+    email: EmailStr
     password: str
+
+    class Config:
+        from_attributes = True
+
+
+class User_Response(BaseModel):
+    name: str
+    user_type: Literal["HUNTER", "ORGANIZATION"]
+    access_token: str
 
     class Config:
         from_attributes = True
