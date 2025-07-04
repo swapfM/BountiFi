@@ -3,10 +3,9 @@ from dotenv import load_dotenv
 load_dotenv()
 from fastapi import FastAPI, Depends
 from db.database import engine, SessionLocal, Base
-from db.schema import User_Create, User_Login, User_Response
-from api.user_api import create_user, login_user
+from api.user.schema import User_Create, User_Login, User_Response
+from api.user.user_api import create_user, login_user
 from sqlalchemy.orm import Session
-import api.user_api
 
 
 Base.metadata.create_all(bind=engine)

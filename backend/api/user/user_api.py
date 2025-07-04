@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
-from db import models, schema
+from db import models
 from argon2 import PasswordHasher
 import os
 import jwt
 from datetime import datetime, timedelta
+from api.user import user_schema as schema
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
