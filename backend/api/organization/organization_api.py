@@ -7,9 +7,9 @@ class OrganizationAPI:
     def __init__(self, db: Session):
         self.db = db
 
-    async def create_bounty(self, bounty_data: BountyCreate):
+    async def create_bounty(self, bounty_data, current_user):
         try:
-            new_bounty = Bounty(**bounty_data.dict())
+            new_bounty = Bounty(**bounty_data.dict(), organization_id=current_user.id)
             self.db.add(new_bounty)
             self.db.commit()
             self.db.refresh(new_bounty)
