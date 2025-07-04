@@ -60,7 +60,9 @@ async def create_user(db: Session, user: schema.User_Create):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        access_token = create_access_token(data={"email": db_user.email})
+        access_token = create_access_token(
+            data={"sub": db_user.email, "scope": db_user.user_type.value}
+        )
         return {
             "name": db_user.name,
             "user_type": db_user.user_type.value,
@@ -80,7 +82,9 @@ async def login_user(db: Session, user: schema.User_Login):
         if not verify_password(user.password, db_user.password):
             return "Invalid password"
 
-        access_token = create_access_token(data={"email": db_user.email})
+        access_token = create_access_token(
+            data={"sub": db_user.email, "scope": db_user.user_type.value}
+        )
 
         return {
             "name": db_user.name,

@@ -1,6 +1,6 @@
 from db.models import Bounty
 from sqlalchemy.orm import Session
-from organization.organization_schema import BountyCreate
+from api.organization.organization_schema import BountyCreate
 
 
 class OrganizationAPI:
