@@ -61,7 +61,11 @@ async def create_user(db: Session, user: schema.User_Create):
         db.commit()
         db.refresh(db_user)
         access_token = create_access_token(
-            data={"sub": db_user.email, "scope": db_user.user_type.value}
+            data={
+                "sub": db_user.email,
+                "id": db_user.id,
+                "scope": db_user.user_type.value,
+            }
         )
         return {
             "name": db_user.name,
@@ -83,7 +87,11 @@ async def login_user(db: Session, user: schema.User_Login):
             return "Invalid password"
 
         access_token = create_access_token(
-            data={"sub": db_user.email, "scope": db_user.user_type.value}
+            data={
+                "sub": db_user.email,
+                "id": db_user.id,
+                "scope": db_user.user_type.value,
+            }
         )
 
         return {
