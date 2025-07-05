@@ -30,3 +30,11 @@ class BountyGet(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ErrorMessage(BaseModel):
+    status: str
+    message: str
+
+    class Config:
+        from_attributes = True
