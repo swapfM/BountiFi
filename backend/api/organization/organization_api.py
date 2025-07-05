@@ -17,3 +17,14 @@ class OrganizationAPI:
         except Exception as e:
             self.db.rollback()
             return {"status": "error", "message": str(e)}
+
+    async def get_bounties_by_organization(self, organization_id):
+        try:
+            bounties = (
+                self.db.query(Bounty)
+                .filter(Bounty.organization_id == organization_id)
+                .all()
+            )
+            return bounties
+        except Exception as e:
+            return {"status": "error", "message": str(e)}

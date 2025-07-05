@@ -12,3 +12,21 @@ class BountyCreate(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class BountyGet(BaseModel):
+    id: int
+    title: str
+    description: str
+    link: str | None = None
+    reward: float
+    status: str
+    organization_id: int
+    deadline: datetime
+    tags: list[str]
+    created_at: datetime
+    updated_at: datetime | None = None
+    assigned_to: int | None = None
+
+    class Config:
+        from_attributes = True

@@ -63,6 +63,7 @@ class Bounty(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(255), nullable=False)
     description = Column(Text, nullable=False)
+    link = Column(String(255), nullable=False)
     reward = Column(Numeric(10, 2), nullable=False)
     status = Column(Enum(BountyStatus), default=BountyStatus.OPEN, nullable=False)
     organization_id = Column(Integer, ForeignKey("users.id"), nullable=False)
