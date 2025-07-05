@@ -6,13 +6,19 @@ from api.organization.organization_schema import BountyCreate, BountyGet
 from db.models import User
 from api.user.user_api import get_current_user
 from fastapi import HTTPException
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from fastapi import Request
 
 
 router = APIRouter(prefix="/organization", tags=["Organization"])
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/create_bounty")
+@limiter.limit("5/minute")
 async def create_bounty_api(
+    request: Request,
     bounty: BountyCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -33,7 +39,9 @@ async def create_bounty_api(
 
 
 @router.get("/bounties", response_model=list[BountyGet])
+@limiter.limit("5/minute")
 async def get_bounties_by_organization_api(
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -53,7 +61,9 @@ async def get_bounties_by_organization_api(
 
 
 @router.delete("/delete_bounty/{bounty_id}")
+@limiter.limit("5/minute")
 async def delete_bounty_api(
+    request: Request,
     bounty_id: int,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
