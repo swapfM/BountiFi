@@ -28,3 +28,20 @@ class OrganizationAPI:
             return bounties
         except Exception as e:
             return {"status": "error", "message": str(e)}
+
+    async def delete_bounty(self, bounty_id, current_user):
+        try:
+            bounty = self.db.query(Bounty).filter(Bounty.id == bounty_id).first()
+            if not bounty:
+                return {"status": "error", "message": "Bounty not found"}
+            if bounty.organization_id != current_user.id:
+                return {
+                    "status": "error",
+                    "message": "Unauthorized to delete this bounty",
+                }
+            self.db.delete(bounty)
+            self.db.commit()
+            return {"status": "success", "message": "Bounty deleted successfully"}
+        except Exception as e:
+            self.db.rollback()
+            return {"status": "error", "message": str(e)}
