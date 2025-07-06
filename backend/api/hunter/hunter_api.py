@@ -12,3 +12,12 @@ class HunterApi:
             return bounties
         except Exception as e:
             return {"status": "error", "message": str(e)}
+
+    async def get_bounty_by_id(self, bounty_id: int):
+        try:
+            bounty = self.db.query(Bounty).filter(Bounty.id == bounty_id).first()
+            if not bounty:
+                return {"status": "error", "message": "Bounty not found"}
+            return bounty
+        except Exception as e:
+            return {"status": "error", "message": str(e)}

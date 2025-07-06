@@ -2,7 +2,12 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
 from api.organization.organization_api import OrganizationAPI
-from api.organization.organization_schema import BountyCreate, BountyGet, ErrorMessage
+from api.organization.organization_schema import (
+    BountyCreate,
+    BountyGet,
+    ErrorMessage,
+    BountySummary,
+)
 from db.models import User
 from api.user.user_api import get_current_user
 from fastapi import HTTPException
@@ -39,7 +44,7 @@ async def create_bounty_api(
         )
 
 
-@router.get("/bounties", response_model=list[BountyGet])
+@router.get("/bounties", response_model=list[BountySummary])
 @limiter.limit("5/minute")
 async def get_bounties_by_organization_api(
     request: Request,
