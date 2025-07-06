@@ -15,7 +15,7 @@ class OrganizationAPI:
             self.db.add(new_bounty)
             self.db.commit()
             self.db.refresh(new_bounty)
-            return {"status": "success", "bounty_id": new_bounty.id}
+            return {"status": "success", "message": "Created bounty successfully"}
         except Exception as e:
             self.db.rollback()
             return {"status": "error", "message": str(e)}
@@ -83,7 +83,7 @@ class OrganizationAPI:
 
             self.db.commit()
             self.db.refresh(bounty)
-            return {"status": "success", "bounty": bounty}
+            return {"status": "success", "message": "Bounty updated successfully"}
         except Exception as e:
             self.db.rollback()
             return {"status": "error", "message": str(e)}

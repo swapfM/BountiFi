@@ -25,7 +25,7 @@ class UserType(enum.Enum):
 
 class BountyStatus(enum.Enum):
     OPEN = "OPEN"
-    IN_PROGRESS = "IN_PROGRESS"
+    ASSIGNED = "ASSIGNED"
     COMPLETED = "COMPLETED"
     CANCELLED = "CANCELLED"
 

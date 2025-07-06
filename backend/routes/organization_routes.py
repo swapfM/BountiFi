@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from api.organization_api import OrganizationAPI
 from schema.organization_schema import BountyCreate
-from schema.common_schema import BountyGet, BountySummary, ErrorMessage
+from schema.common_schema import BountyGet, BountySummary, ErrorMessage, SuccessMessage
 from db.models import User
 from api.user_api import get_current_user
 from fastapi import HTTPException
@@ -11,13 +11,14 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from fastapi import Request
 from fastapi.responses import JSONResponse
+from logger import logger
 
 
 router = APIRouter(prefix="/organization", tags=["Organization"])
 limiter = Limiter(key_func=get_remote_address)
 
 
-@router.post("/create_bounty")
+@router.post("/create_bounty", response_model=SuccessMessage | ErrorMessage)
 @limiter.limit("5/minute")
 async def create_bounty_api(
     request: Request,
@@ -27,20 +28,26 @@ async def create_bounty_api(
 ):
     try:
         if current_user.user_type.value != "ORGANIZATION":
-            raise HTTPException(
-                status_code=403, detail="Only organizations can post bounties"
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Only organizations can post bounties",
+                },
             )
         organization_api = OrganizationAPI(db)
         return await organization_api.create_bounty(
             bounty_data=bounty, current_user=current_user
         )
     except Exception as e:
+        logger.error(f"Error creating bounty: {str(e)}")
         return JSONResponse(
-            status_code=500, content={"status": "error", "message": str(e)}
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
         )
 
 
-@router.get("/bounties", response_model=list[BountySummary])
+@router.get("/bounties", response_model=list[BountySummary] | ErrorMessage)
 @limiter.limit("5/minute")
 async def get_bounties_by_organization_api(
     request: Request,
@@ -49,20 +56,28 @@ async def get_bounties_by_organization_api(
 ):
     try:
         if current_user.user_type.value != "ORGANIZATION":
-            raise HTTPException(
-                status_code=403, detail="Only organizations can view their bounties"
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Only organizations can view their bounties",
+                },
             )
         organization_api = OrganizationAPI(db)
         return await organization_api.get_bounties_by_organization(
             organization_id=current_user.id
         )
     except Exception as e:
+        logger.error(f"Error fetching bounties by organization: {str(e)}")
         return JSONResponse(
-            status_code=500, content={"status": "error", "message": str(e)}
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
         )
 
 
-@router.delete("/delete_bounty/{bounty_id}")
+@router.delete(
+    "/delete_bounty/{bounty_id}", response_model=SuccessMessage | ErrorMessage
+)
 @limiter.limit("5/minute")
 async def delete_bounty_api(
     request: Request,
@@ -72,16 +87,22 @@ async def delete_bounty_api(
 ):
     try:
         if current_user.user_type.value != "ORGANIZATION":
-            raise HTTPException(
-                status_code=403, detail="Only organizations can delete bounties"
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Only organizations can delete bounties",
+                },
             )
         organization_api = OrganizationAPI(db)
         return await organization_api.delete_bounty(
             bounty_id=bounty_id, current_user=current_user
         )
     except Exception as e:
+        logger.error(f"Error deleting bounty {bounty_id}: {str(e)}")
         return JSONResponse(
-            status_code=500, content={"status": "error", "message": str(e)}
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
         )
 
 
@@ -95,20 +116,26 @@ async def get_bounty_by_id_api(
 ):
     try:
         if current_user.user_type.value != "ORGANIZATION":
-            raise HTTPException(
-                status_code=403, detail="Only organizations can view their bounties"
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Only organizations can view their bounties",
+                },
             )
         organization_api = OrganizationAPI(db)
         return await organization_api.get_bounty_by_id(
             bounty_id=bounty_id, current_user=current_user
         )
     except Exception as e:
+        logger.error(f"Error fetching bounty by ID {bounty_id}: {str(e)}")
         return JSONResponse(
-            status_code=500, content={"status": "error", "message": str(e)}
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
         )
 
 
-@router.put("/update_bounty/{bounty_id}")
+@router.put("/update_bounty/{bounty_id}", response_model=SuccessMessage | ErrorMessage)
 @limiter.limit("5/minute")
 async def update_bounty_api(
     request: Request,
@@ -119,14 +146,20 @@ async def update_bounty_api(
 ):
     try:
         if current_user.user_type.value != "ORGANIZATION":
-            raise HTTPException(
-                status_code=403, detail="Only organizations can update bounties"
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Only organizations can update bounties",
+                },
             )
         organization_api = OrganizationAPI(db)
         return await organization_api.update_bounty(
             bounty_id=bounty_id, bounty_data=bounty, current_user=current_user
         )
     except Exception as e:
+        logger.error(f"Error updating bounty {bounty_id}: {str(e)}")
         return JSONResponse(
-            status_code=500, content={"status": "error", "message": str(e)}
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
         )

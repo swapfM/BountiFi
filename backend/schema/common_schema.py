@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Literal
 
 
 class BountySummary(BaseModel):
@@ -33,7 +34,15 @@ class BountyGet(BaseModel):
 
 
 class ErrorMessage(BaseModel):
-    status: str
+    status: Literal["error"]
+    message: str
+
+    class Config:
+        from_attributes = True
+
+
+class SuccessMessage(BaseModel):
+    status: Literal["success"]
     message: str
 
     class Config:
