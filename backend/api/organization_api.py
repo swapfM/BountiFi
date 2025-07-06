@@ -1,6 +1,6 @@
 from db.models import Bounty
 from sqlalchemy.orm import Session
-from api.organization.organization_schema import BountyCreate
+from schema.organization_schema import BountyCreate
 from fastapi import HTTPException, status
 from db.models import User, Bounty
 

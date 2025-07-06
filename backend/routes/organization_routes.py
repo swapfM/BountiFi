@@ -1,15 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
-from api.organization.organization_api import OrganizationAPI
-from api.organization.organization_schema import (
-    BountyCreate,
-    BountyGet,
-    ErrorMessage,
-    BountySummary,
-)
+from api.organization_api import OrganizationAPI
+from schema.organization_schema import BountyCreate
+from schema.common_schema import BountyGet, BountySummary, ErrorMessage
 from db.models import User
-from api.user.user_api import get_current_user
+from api.user_api import get_current_user
 from fastapi import HTTPException
 from slowapi import Limiter
 from slowapi.util import get_remote_address
