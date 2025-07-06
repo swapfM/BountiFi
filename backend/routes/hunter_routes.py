@@ -10,6 +10,7 @@ from slowapi.util import get_remote_address
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from schema.common_schema import BountyGet, BountySummary, ErrorMessage, SuccessMessage
+from schema.hunter_schema import CreateSolutionSchema
 from logger import logger
 
 router = APIRouter(prefix="/hunter", tags=["Hunter"])
@@ -120,6 +121,35 @@ async def get_assigned_bounties_api(
         return await hunter_api.get_assigned_bounties(hunter_id=current_user.id)
     except Exception as e:
         logger.error(f"Error fetching assigned bounties: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
+        )
+
+
+@router.post("/submit_solution", response_model=SuccessMessage | ErrorMessage)
+@limiter.limit("5/minute")
+async def submit_solution_api(
+    request: Request,
+    solution_data: CreateSolutionSchema,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        if current_user.user_type.value != "HUNTER":
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Only hunters can create solutions",
+                },
+            )
+        hunter_api = HunterApi(db)
+        return await hunter_api.submit_solution(
+            bounty_id=bounty_id, hunter_id=current_user.id, solution_data=solution_data
+        )
+    except Exception as e:
+        logger.error(f"Error creating solution for bounty {bounty_id}: {str(e)}")
         return JSONResponse(
             status_code=500,
             content={"status": "error", "message": "Something went wrong"},

@@ -26,8 +26,14 @@ class UserType(enum.Enum):
 class BountyStatus(enum.Enum):
     OPEN = "OPEN"
     ASSIGNED = "ASSIGNED"
+    IN_REVIEW = "IN_REVIEW"
     COMPLETED = "COMPLETED"
-    CANCELLED = "CANCELLED"
+
+
+class BountySolutionStatus(enum.Enum):
+    IN_REVIEW = "IN_REVIEW"
+    ACCEPTED = "ACCEPTED"
+    NEEDS_CHANGES = "NEEDS_CHANGES"
 
 
 class User(Base):
@@ -84,4 +90,32 @@ class Bounty(Base):
         return (
             f"<Bounty(id={self.id}, title={self.title}, "
             f"reward={self.reward}, status={self.status})>"
+        )
+
+
+class BountySolution(Base):
+    __tablename__ = "bounty_solutions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    bounty_id = Column(Integer, ForeignKey("bounties.id"), nullable=False)
+    hunter_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    description = Column(Text, nullable=False)
+    solution_file = Column(String(255), nullable=True)
+    solution_link = Column(String(255), nullable=True)
+    status = Column(
+        Enum(BountySolutionStatus),
+        default=BountySolutionStatus.IN_REVIEW,
+        nullable=False,
+    )
+    feedback = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    bounty = relationship("Bounty", back_populates="solutions")
+    hunter = relationship("User", back_populates="solutions")
+
+    def __repr__(self):
+        return (
+            f"<BountySolution(id={self.id}, bounty_id={self.bounty_id}, "
+            f"hunter_id={self.hunter_id})>"
         )
