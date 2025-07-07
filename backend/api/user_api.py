@@ -80,6 +80,11 @@ async def create_user(db: Session, user: User_Create):
     try:
         hashed_password = encrypt_password(user.password)
         user.password = hashed_password
+        existing_user = (
+            db.query(models.User).filter(models.User.email == user.email).first()
+        )
+        if existing_user:
+            raise HTTPException(status_code=401, detail="User Already Exists")
         db_user = models.User(
             email=user.email,
             name=user.name,
