@@ -87,3 +87,14 @@ class OrganizationAPI:
         except Exception as e:
             self.db.rollback()
             return {"status": "error", "message": str(e)}
+
+    async def get_bounty_solution(self, bounty_id: int):
+        try:
+            bounty = self.db.query(Bounty).filter(Bounty.id == bounty_id).first()
+            if not bounty:
+                return {"status": "error", "message": "Bounty not found"}
+
+            solutions = bounty.solutions
+            return solutions
+        except Exception as e:
+            return {"status": "error", "message": f"Server error: {str(e)}"}

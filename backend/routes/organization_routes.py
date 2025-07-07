@@ -3,7 +3,13 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from api.organization_api import OrganizationAPI
 from schema.organization_schema import BountyCreate
-from schema.common_schema import BountyGet, BountySummary, ErrorMessage, SuccessMessage
+from schema.common_schema import (
+    BountyGet,
+    BountySummary,
+    ErrorMessage,
+    SuccessMessage,
+    BountySolutionResponse,
+)
 from db.models import User
 from api.user_api import get_current_user
 from fastapi import HTTPException
@@ -159,6 +165,35 @@ async def update_bounty_api(
         )
     except Exception as e:
         logger.error(f"Error updating bounty {bounty_id}: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
+        )
+
+
+@router.get(
+    "/bounty_solution/{bounty_id}", response_model=BountySolutionResponse | ErrorMessage
+)
+@limiter.limit("5/minute")
+async def get_bounty_solutions_api(
+    request: Request,
+    bounty_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        if current_user.user_type.value != "ORGANIZATION":
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Only organizations can view bounty solutions",
+                },
+            )
+        organization_api = OrganizationAPI(db)
+        return await organization_api.get_bounty_solution(bounty_id=bounty_id)
+    except Exception as e:
+        logger.error(f"Error fetching solutions for bounty {bounty_id}: {str(e)}")
         return JSONResponse(
             status_code=500,
             content={"status": "error", "message": "Something went wrong"},

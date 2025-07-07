@@ -49,6 +49,19 @@ class BountySolutionResponse(BaseModel):
         from_attributes = True
 
 
+class BountySolution(BaseModel):
+    bounty_id: int
+    hunter_id: int
+    description: str
+    solution_file: str | None = None
+    solution_link: str | None = None
+    status: str
+    feedback: str | None = None
+
+    class Config:
+        from_attributes = True
+
+
 class ErrorMessage(BaseModel):
     status: Literal["error"]
     message: str
