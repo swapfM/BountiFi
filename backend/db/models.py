@@ -56,6 +56,8 @@ class User(Base):
         "Bounty", foreign_keys="Bounty.assigned_to", back_populates="hunter"
     )
 
+    solutions = relationship("BountySolution", back_populates="hunter")
+
     def __repr__(self):
         return (
             f"<User(id={self.id}, email={self.email}, "
@@ -85,6 +87,7 @@ class Bounty(Base):
     hunter = relationship(
         "User", foreign_keys=[assigned_to], back_populates="assigned_bounties"
     )
+    solutions = relationship("BountySolution", back_populates="bounty")
 
     def __repr__(self):
         return (

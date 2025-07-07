@@ -146,7 +146,7 @@ async def submit_solution_api(
             )
         hunter_api = HunterApi(db)
         return await hunter_api.submit_solution(
-            bounty_id=bounty_id, hunter_id=current_user.id, solution_data=solution_data
+            hunter_id=current_user.id, solution_data=solution_data
         )
     except Exception as e:
         logger.error(f"Error creating solution for bounty {bounty_id}: {str(e)}")
