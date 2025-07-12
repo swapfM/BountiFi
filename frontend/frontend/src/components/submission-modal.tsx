@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 
 interface SubmissionModalProps {
   bounty: any;
@@ -29,12 +30,20 @@ export function SubmissionModal({
     notes: "",
   });
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    toast({
+      title: "Solution Submitted Successfully",
+      description:
+        "Your submission has been sent for review. You'll be notified once it's reviewed.",
+      variant: "success",
+    });
 
     setLoading(false);
     onClose();

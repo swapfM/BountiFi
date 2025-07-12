@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { DatePicker } from "@/components/ui/date-picker";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CreateBountyModalProps {
   isOpen: boolean;
@@ -67,12 +68,13 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
     githubIssueLink: "",
   });
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // call API for test
+    // api call from heree
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     toast({

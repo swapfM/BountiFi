@@ -8,7 +8,7 @@ import { SubmissionModal } from "@/components/submission-modal";
 import { BountyDetailsModal } from "@/components/bounty-details-modal";
 import { Calendar, DollarSign, Edit, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
-
+import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 
 interface BountyCardProps {
@@ -42,6 +42,7 @@ export function BountyCard({
 }: BountyCardProps) {
   const [submissionOpen, setSubmissionOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const { toast } = useToast();
 
   const statusColors = {
     open: "bg-neon-green/20 text-neon-green border-neon-green/30",
@@ -53,13 +54,20 @@ export function BountyCard({
   const glowClass = userType === "org" ? "neon-glow" : "neon-glow-green";
 
   function formatDeadline(date: Date | string) {
-    //“MM/dd/yyyy”
+    //  “MM/dd/yyyy” for now
     return format(date, "MM/dd/yyyy");
   }
 
-  // need to handle claim bounty
-
-  const handleClaimBounty = () => {};
+  const handleClaimBounty = () => {
+    if (onClaim) {
+      onClaim();
+      toast({
+        title: "Bounty Claimed Successfully! 🎉",
+        description: `You've claimed "${bounty.title}". Check your My Tasks tab to start working on it.`,
+        variant: "success",
+      });
+    }
+  };
 
   return (
     <>
@@ -157,7 +165,6 @@ export function BountyCard({
             </Badge>
 
             <div className="flex space-x-2">
-              {/* Show View Details only for hunters viewing available bounties (not in My Tasks) */}
               {userType === "hunter" &&
                 bounty.status === "open" &&
                 !showSubmit && (
@@ -183,6 +190,7 @@ export function BountyCard({
                   </>
                 )}
 
+              {/* Show only Submit Solution for tasks in progress */}
               {showSubmit && bounty.status === "in-progress" && (
                 <Button
                   size="sm"
@@ -195,6 +203,8 @@ export function BountyCard({
                   Submit Solution
                 </Button>
               )}
+
+              {/* For org cards, no action buttons in the bottom area */}
             </div>
           </div>
         </CardContent>
