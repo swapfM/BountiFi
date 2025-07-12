@@ -6,9 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Target,
-  GitBranch,
   FileCheck,
-  Settings,
   ChevronLeft,
   ChevronRight,
   Zap,
@@ -21,9 +19,7 @@ interface OrgSidebarProps {
 
 const menuItems = [
   { icon: Target, label: "My Bounties", href: "/org/dashboard" },
-  { icon: GitBranch, label: "Imported Issues", href: "/org/imported-issues" },
   { icon: FileCheck, label: "Review Submissions", href: "/org/review" },
-  { icon: Settings, label: "Settings", href: "/org/settings" },
 ];
 
 export function OrgSidebar({ collapsed, onToggle }: OrgSidebarProps) {

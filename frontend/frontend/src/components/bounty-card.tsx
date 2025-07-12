@@ -54,15 +54,15 @@ export function BountyCard({
   const glowClass = userType === "org" ? "neon-glow" : "neon-glow-green";
 
   function formatDeadline(date: Date | string) {
-    //  “MM/dd/yyyy” for now
-    return format(date, "MM/dd/yyyy");
+    //  “dd/MM/yyyy” date format for now
+    return format(date, "dd/MM/yyyy");
   }
 
   const handleClaimBounty = () => {
     if (onClaim) {
       onClaim();
       toast({
-        title: "Bounty Claimed Successfully! 🎉",
+        title: "Bounty Claimed Successfully! ",
         description: `You've claimed "${bounty.title}". Check your My Tasks tab to start working on it.`,
         variant: "success",
       });
@@ -165,6 +165,7 @@ export function BountyCard({
             </Badge>
 
             <div className="flex space-x-2">
+              {/* Show View Details only for hunters viewing available bounties (not in My Tasks) */}
               {userType === "hunter" &&
                 bounty.status === "open" &&
                 !showSubmit && (

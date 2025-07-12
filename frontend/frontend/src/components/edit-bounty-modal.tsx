@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,8 @@ import { MultiSelect } from "@/components/ui/multi-select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useToast } from "@/components/ui/use-toast";
 
-interface CreateBountyModalProps {
+interface EditBountyModalProps {
+  bounty: any;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -43,25 +44,21 @@ const techOptions = [
   "Node.js",
   "Python",
   "Rust",
-  "Go",
-  "Docker",
-  "Kubernetes",
-  "AWS",
-  "IPFS",
-  "GraphQL",
-  "PostgreSQL",
-  "MongoDB",
 ];
 
-const currencyOptions = ["USDC", "ETH", "USDT", "DAI"];
+const currencyOptions = ["BDAG", "ETH"];
 
-export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
+export function EditBountyModal({
+  bounty,
+  isOpen,
+  onClose,
+}: EditBountyModalProps) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     techStack: [] as string[],
     payoutAmount: "",
-    payoutCurrency: "USDC",
+    payoutCurrency: "BDAG",
     deadline: null as Date | null,
     codebaseUrl: "",
     externalWebsite: "",
@@ -70,43 +67,46 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (bounty) {
+      setFormData({
+        title: bounty.title || "",
+        description: bounty.description || "",
+        techStack: bounty.techStack || [],
+        payoutAmount: bounty.payout?.replace(/[^\d]/g, "") || "",
+        payoutCurrency: bounty.payout?.includes("ETH") ? "ETH" : "USDC",
+        deadline: bounty.deadline ? new Date(bounty.deadline) : null,
+        codebaseUrl: bounty.codebaseUrl || "",
+        externalWebsite: bounty.externalWebsite || "",
+        githubIssueLink: bounty.githubIssueLink || "",
+      });
+    }
+  }, [bounty]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     toast({
-      title: "Bounty Created Successfully",
-      description:
-        "Your bounty has been posted and is now live for hunters to claim.",
+      title: "Bounty Updated Successfully",
+      description: "Your bounty has been updated with the new information.",
       variant: "success",
     });
 
     setLoading(false);
     onClose();
-
-    // Reset form
-    setFormData({
-      title: "",
-      description: "",
-      techStack: [],
-      payoutAmount: "",
-      payoutCurrency: "USDC",
-      deadline: null,
-      codebaseUrl: "",
-      externalWebsite: "",
-      githubIssueLink: "",
-    });
   };
+
+  if (!bounty) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-3xl bg-card/90 backdrop-blur-sm border-border max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-3xl font-bold text-neon-blue">
-            Create New Bounty
+            Edit Bounty
           </DialogTitle>
         </DialogHeader>
 
@@ -123,7 +123,6 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
                   setFormData((prev) => ({ ...prev, title: e.target.value }))
                 }
                 className="bg-input border-border focus:border-neon-blue focus:ring-neon-blue/20"
-                placeholder="e.g., Build DeFi Dashboard UI"
                 required
               />
             </div>
@@ -142,7 +141,6 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
                   }))
                 }
                 className="bg-input border-border focus:border-neon-blue focus:ring-neon-blue/20 min-h-[120px]"
-                placeholder="Describe the bounty requirements, deliverables, and acceptance criteria..."
                 required
               />
             </div>
@@ -174,7 +172,6 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
                   }))
                 }
                 className="bg-input border-border focus:border-neon-blue focus:ring-neon-blue/20"
-                placeholder="5000"
                 required
               />
             </div>
@@ -225,7 +222,6 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
                   }))
                 }
                 className="bg-input border-border focus:border-neon-blue focus:ring-neon-blue/20"
-                placeholder="https://github.com/org/project"
               />
             </div>
 
@@ -244,7 +240,6 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
                   }))
                 }
                 className="bg-input border-border focus:border-neon-blue focus:ring-neon-blue/20"
-                placeholder="https://project.org"
               />
             </div>
 
@@ -263,7 +258,6 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
                   }))
                 }
                 className="bg-input border-border focus:border-neon-blue focus:ring-neon-blue/20"
-                placeholder="https://github.com/org/project/issues/123"
               />
             </div>
           </div>
@@ -282,7 +276,7 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
               disabled={loading}
               className="bg-neon-blue hover:bg-neon-blue/80 text-black font-semibold neon-glow px-8"
             >
-              {loading ? "Creating..." : "Create Bounty"}
+              {loading ? "Updating..." : "Update Bounty"}
             </Button>
           </div>
         </form>

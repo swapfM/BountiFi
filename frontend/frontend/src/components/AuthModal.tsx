@@ -53,18 +53,33 @@ export function AuthModal({ type, isOpen, onClose }: AuthModalProps) {
         });
 
         if (response.user_type === "ORGANIZATION") {
-          localStorage.setItem("user_data", response);
+          localStorage.setItem("name", response.name);
+          localStorage.setItem("user_type", response.user_type);
+          localStorage.setItem("access_token", response.access_token);
+
           router.push("/org/dashboard");
         } else {
+          localStorage.setItem("name", response.name);
+          localStorage.setItem("user_type", response.user_type);
+          localStorage.setItem("access_token", response.access_token);
+
           router.push("/hunter/dashboard");
         }
       } else if (type === "login") {
         const response = await loginUser({ email, password });
 
         if (response.user_type === "ORGANIZATION") {
-          localStorage.setItem("user_data", response.data);
+          console.log(response);
+          localStorage.setItem("name", response.name);
+          localStorage.setItem("user_type", response.user_type);
+          localStorage.setItem("access_token", response.access_token);
+
           router.push("/org/dashboard");
         } else {
+          localStorage.setItem("name", response.name);
+          localStorage.setItem("user_type", response.user_type);
+          localStorage.setItem("access_token", response.access_token);
+
           router.push("/hunter/dashboard");
         }
       }
