@@ -57,6 +57,10 @@ export function BountyCard({
     return format(date, "MM/dd/yyyy");
   }
 
+  // need to handle claim bounty
+
+  const handleClaimBounty = () => {};
+
   return (
     <>
       <Card
@@ -179,7 +183,6 @@ export function BountyCard({
                   </>
                 )}
 
-              {/* Show only Submit Solution for tasks in progress */}
               {showSubmit && bounty.status === "in-progress" && (
                 <Button
                   size="sm"
@@ -192,8 +195,6 @@ export function BountyCard({
                   Submit Solution
                 </Button>
               )}
-
-              {/* For org cards, no action buttons in the bottom area */}
             </div>
           </div>
         </CardContent>
