@@ -1,14 +1,25 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class BountyCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=100)
     description: str = Field(..., min_length=1, max_length=500)
-    link: str = Field(..., min_length=1, max_length=255)
-    reward: float = Field(..., gt=0)
+    codebase_link: Optional[str] = Field(
+        default=None, min_length=1, max_length=255, alias="codebaseUrl"
+    )
+    website_link: Optional[str] = Field(
+        default=None, max_length=255, alias="externalWebsite"
+    )
+    github_issue_link: Optional[str] = Field(
+        default=None, max_length=255, alias="githubIssueLink"
+    )
+    payout_amount: float = Field(..., gt=0, alias="payoutAmount")
+    payout_currency: str = Field(..., min_length=1, alias="payoutCurrency")
+
     deadline: datetime
-    tags: list[str] = Field(default_factory=list)
+    tech_stack: list[str] = Field(default_factory=list, alias="techStack")
 
     class Config:
         from_attributes = True

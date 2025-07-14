@@ -6,10 +6,12 @@ from typing import Literal
 class BountySummary(BaseModel):
     id: int
     title: str
-    reward: float
-    status: str
+    payout_amount: float
+    payout_currency: str
+    description: str
     deadline: datetime | None = None
-    tags: list[str]
+    tech_stack: list[str]
+    status: str
 
     class Config:
         from_attributes = True
