@@ -23,14 +23,15 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { useGetOrgBountyDetails } from "@/hooks/useGetOrgBountyDetails";
+import { useGetBountyDetails } from "@/hooks/useGetBountyDetails";
+import { useAuth } from "@/context/AuthContext";
 
 interface BountyDetailsModalProps {
   bountyId: number;
   isOpen: boolean;
   onClose: () => void;
   onClaim?: (bountyId: string) => void;
-  userType: "org" | "hunter";
+  userType: "ORGANIZATION" | "HUNTER";
 }
 
 interface BountyDetails {
@@ -58,8 +59,13 @@ export function BountyDetailsModal({
   userType,
 }: BountyDetailsModalProps) {
   const [bounty, setBounty] = useState<BountyDetails | null>(null);
-  const token = localStorage.getItem("access_token");
-  const { data } = useGetOrgBountyDetails(token ?? "", bountyId ?? "");
+  const { accessToken, userType: authUserType } = useAuth();
+
+  const { data } = useGetBountyDetails(
+    accessToken ?? "",
+    bountyId ?? "",
+    authUserType ?? ""
+  );
 
   useEffect(() => {
     if (data) {

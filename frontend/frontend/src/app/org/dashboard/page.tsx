@@ -56,7 +56,7 @@ export default function OrgDashboard() {
             <BountyCard
               key={bounty.id}
               bounty={bounty}
-              userType="org"
+              userType="ORGANIZATION"
               onEdit={() => setEditBounty(bounty)}
             />
           ))}

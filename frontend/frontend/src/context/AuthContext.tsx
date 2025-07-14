@@ -23,36 +23,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [name, setName] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userType, setUserType] = useState<string | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
+  // Load from localStorage once, on first render
   useEffect(() => {
     setName(localStorage.getItem("name"));
     setAccessToken(localStorage.getItem("access_token"));
     setUserType(localStorage.getItem("user_type"));
+    setIsHydrated(true); // Prevent writing before hydration
   }, []);
 
+  // Sync with localStorage only after hydration
   useEffect(() => {
+    if (!isHydrated) return;
     if (name) {
       localStorage.setItem("name", name);
     } else {
       localStorage.removeItem("name");
     }
-  }, [name]);
+  }, [name, isHydrated]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (accessToken) {
       localStorage.setItem("access_token", accessToken);
     } else {
       localStorage.removeItem("access_token");
     }
-  }, [accessToken]);
+  }, [accessToken, isHydrated]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (userType) {
       localStorage.setItem("user_type", userType);
     } else {
       localStorage.removeItem("user_type");
     }
-  }, [userType]);
+  }, [userType, isHydrated]);
 
   return (
     <AuthContext.Provider

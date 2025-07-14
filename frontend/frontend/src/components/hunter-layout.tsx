@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { FuturisticBackground } from "@/components/FuturisticBackground";
+import FuturisticBackground from "@/components/FuturisticBackground";
 import { HunterNavbar } from "@/components/hunter-navbar";
 
 interface HunterLayoutProps {

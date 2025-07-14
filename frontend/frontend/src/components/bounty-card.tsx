@@ -29,7 +29,7 @@ interface BountyCardProps {
     externalWebsite?: string;
     githubIssueLink?: string;
   };
-  userType: "org" | "hunter";
+  userType: "ORGANIZATION" | "HUNTER";
   showSubmit?: boolean;
   onEdit?: () => void;
   onClaim?: () => void;
@@ -52,8 +52,9 @@ export function BountyCard({
     completed: "bg-gray-500/20 text-gray-400 border-gray-500/30",
   };
 
-  const accentColor = userType === "org" ? "neon-blue" : "neon-green";
-  const glowClass = userType === "org" ? "neon-glow" : "neon-glow-green";
+  const accentColor = userType === "ORGANIZATION" ? "neon-blue" : "neon-green";
+  const glowClass =
+    userType === "ORGANIZATION" ? "neon-glow" : "neon-glow-green";
 
   function formatDeadline(date: Date | string) {
     //  “dd/MM/yyyy” date format for now
@@ -78,7 +79,7 @@ export function BountyCard({
           "bg-card/50 backdrop-blur-sm border-border hover:border-opacity-50 transition-all duration-300 group h-full",
           `hover:border-${accentColor}`,
           bounty.isNew &&
-            userType === "hunter" &&
+            userType === "HUNTER" &&
             "ring-1 ring-neon-green/30 neon-glow-green"
         )}
       >
@@ -88,7 +89,7 @@ export function BountyCard({
               {bounty.title}
             </CardTitle>
             <div className="flex items-center space-x-2">
-              {bounty.isNew && userType === "hunter" && (
+              {bounty.isNew && userType === "HUNTER" && (
                 <Badge className="bg-neon-green/20 text-neon-green border-neon-green/30 text-xs">
                   NEW
                 </Badge>
@@ -103,7 +104,7 @@ export function BountyCard({
                   <Eye className="h-4 w-4" />
                 </Button>
               }
-              {userType === "org" && onEdit && (
+              {userType === "ORGANIZATION" && onEdit && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -168,8 +169,8 @@ export function BountyCard({
 
             <div className="flex space-x-2">
               {/* Show View Details only for hunters viewing available bounties (not in My Tasks) */}
-              {userType === "hunter" &&
-                bounty.status === "open" &&
+              {userType === "HUNTER" &&
+                bounty.status === "OPEN" &&
                 !showSubmit && (
                   <>
                     <Button
