@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Building2, User } from "lucide-react";
 import { loginUser, signupUser } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 interface AuthModalProps {
   type: "login" | "signup" | null;
@@ -33,6 +34,7 @@ export function AuthModal({ type, isOpen, onClose }: AuthModalProps) {
   >(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { setName: setAuthName, setAccessToken, setUserType } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,43 +54,30 @@ export function AuthModal({ type, isOpen, onClose }: AuthModalProps) {
           user_type: selectedRole,
         });
 
-        if (response.user_type === "ORGANIZATION") {
-          localStorage.setItem("name", response.name);
-          localStorage.setItem("user_type", response.user_type);
-          localStorage.setItem("access_token", response.access_token);
+        setAuthName(response.name);
+        setUserType(response.user_type);
+        setAccessToken(response.access_token);
 
-          router.push("/org/dashboard");
-        } else {
-          localStorage.setItem("name", response.name);
-          localStorage.setItem("user_type", response.user_type);
-          localStorage.setItem("access_token", response.access_token);
-
-          router.push("/hunter/dashboard");
-        }
+        router.push(
+          response.user_type === "ORGANIZATION"
+            ? "/org/dashboard"
+            : "/hunter/dashboard"
+        );
       } else if (type === "login") {
         const response = await loginUser({ email, password });
 
-        if (response.user_type === "ORGANIZATION") {
-          console.log(response);
-          localStorage.setItem("name", response.name);
-          localStorage.setItem("user_type", response.user_type);
-          localStorage.setItem("access_token", response.access_token);
+        setAuthName(response.name);
+        setUserType(response.user_type);
+        setAccessToken(response.access_token);
 
-          router.push("/org/dashboard");
-        } else {
-          localStorage.setItem("name", response.name);
-          localStorage.setItem("user_type", response.user_type);
-          localStorage.setItem("access_token", response.access_token);
-
-          router.push("/hunter/dashboard");
-        }
+        router.push(
+          response.user_type === "ORGANIZATION"
+            ? "/org/dashboard"
+            : "/hunter/dashboard"
+        );
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        alert(err.message || "Authentication failed");
-      } else {
-        alert("Authentication failed");
-      }
+      alert(err instanceof Error ? err.message : "Authentication failed");
     } finally {
       setLoading(false);
       onClose();
