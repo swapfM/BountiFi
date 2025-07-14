@@ -1,59 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OrgLayout } from "@/components/org-layout";
 import { BountyCard } from "@/components/bounty-card";
 import { CreateBountyModal } from "@/components/create-bounty-modal";
 import { EditBountyModal } from "@/components/edit-bounty-modal";
+import { useGetOrgBounties } from "@/hooks/useGetOrgBounties";
 
-const mockBounties = [
-  {
-    id: "1",
-    title: "Implement Smart Contract Audit System",
-    techStack: ["Solidity", "Hardhat", "OpenZeppelin", "Slither"],
-    payout: "5000 USDC",
-    deadline: "2024-02-15",
-    status: "open" as const,
-    description:
-      "Build a comprehensive audit system for smart contracts with automated vulnerability detection.",
-    githubIssueLink: "https://github.com/org/project/issues/123",
-    codebaseUrl: "https://github.com/org/project",
-    externalWebsite: "https://project.org",
-  },
-  {
-    id: "2",
-    title: "Build DeFi Dashboard UI",
-    techStack: ["React", "TypeScript", "Web3.js", "Tailwind"],
-    payout: "3000 USDC",
-    deadline: "2024-02-20",
-    status: "in-progress" as const,
-    description:
-      "Create a responsive dashboard for DeFi protocol with real-time data visualization.",
-    githubIssueLink: "https://github.com/org/defi-ui/issues/45",
-    codebaseUrl: "https://github.com/org/defi-ui",
-    externalWebsite: "https://defi.project.org",
-  },
-  {
-    id: "3",
-    title: "Optimize Gas Usage in DEX",
-    techStack: ["Solidity", "Foundry", "Assembly"],
-    payout: "2000 USDC",
-    deadline: "2024-02-10",
-    status: "completed" as const,
-    description:
-      "Reduce gas costs in decentralized exchange smart contracts by 30%.",
-    githubIssueLink: "https://github.com/org/dex/issues/67",
-    codebaseUrl: "https://github.com/org/dex",
-    externalWebsite: "https://dex.project.org",
-  },
-];
+interface bountySummary {
+  id: number;
+  title: string;
+  description: string;
+  techStack: string[];
+  payoutAmount: number;
+  payoutCurrency: string;
+  status: string;
+  deadline: Date;
+}
 
 export default function OrgDashboard() {
   const [createBountyOpen, setCreateBountyOpen] = useState(false);
-  const [editBounty, setEditBounty] = useState<(typeof mockBounties)[0] | null>(
-    null
-  );
+  const [editBounty, setEditBounty] = useState<bountySummary | null>(null);
+  const token = localStorage.getItem("access_token");
+  const [mockBounties, setMockBounties] = useState<bountySummary[]>([]);
 
+  const { data } = useGetOrgBounties(token ?? "");
+
+  useEffect(() => {
+    if (data) {
+      setMockBounties(data);
+    }
+  }, [data]);
   return (
     <OrgLayout onCreateBounty={() => setCreateBountyOpen(true)}>
       <div className="space-y-8">

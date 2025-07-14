@@ -1,6 +1,6 @@
-// hooks/useOrgBounties.ts
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import camelcaseKeys from "camelcase-keys";
 
 const BASE_URL = process.env.NEXT_PUBLIC_FASTAPI_HOST;
 
@@ -10,7 +10,7 @@ const fetchOrgBounties = async (token: string) => {
       Authorization: `Bearer ${token}`,
     },
   });
-  return response.data;
+  return camelcaseKeys(response.data, { deep: true });
 };
 
 export const useGetOrgBounties = (token: string) => {

@@ -19,38 +19,54 @@ import {
   Target,
   Code,
   FileText,
+  HandCoins,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { useGetOrgBountyDetails } from "@/hooks/useGetOrgBountyDetails";
 
 interface BountyDetailsModalProps {
-  bounty: {
-    id: string;
-    title: string;
-    orgName?: string;
-    orgLogo?: string;
-    techStack: string[];
-    payout: string;
-    deadline: string;
-    status: "open" | "in-progress" | "completed";
-    isNew?: boolean;
-    description?: string;
-    codebaseUrl?: string;
-    externalWebsite?: string;
-    githubIssueLink?: string;
-  } | null;
+  bountyId: number;
   isOpen: boolean;
   onClose: () => void;
   onClaim?: (bountyId: string) => void;
   userType: "org" | "hunter";
 }
 
+interface BountyDetails {
+  id: number;
+  title: string;
+  orgName?: string;
+  orgLogo?: string;
+  techStack: string[];
+  payoutAmount: number;
+  payoutCurrency: string;
+  deadline: Date;
+  status: string;
+  isNew?: boolean;
+  description?: string;
+  codebaseLink?: string;
+  websiteLink?: string;
+  githubIssueLink?: string;
+}
+
 export function BountyDetailsModal({
-  bounty,
+  bountyId,
   isOpen,
   onClose,
   onClaim,
   userType,
 }: BountyDetailsModalProps) {
+  const [bounty, setBounty] = useState<BountyDetails | null>(null);
+  const token = localStorage.getItem("access_token");
+  const { data } = useGetOrgBountyDetails(token ?? "", bountyId ?? "");
+
+  useEffect(() => {
+    if (data) {
+      setBounty(data);
+    }
+  }, [data]);
+
   if (!bounty) return null;
 
   const handleClaimBounty = () => {};
@@ -106,11 +122,12 @@ export function BountyDetailsModal({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-muted/20 rounded-lg p-4 border border-border">
               <div className="flex items-center space-x-2 text-neon-green mb-2">
-                <DollarSign className="w-5 h-5" />
+                <HandCoins className="w-5 h-5" />
                 <span className="font-semibold">Payout</span>
               </div>
-              <div className="text-2xl font-bold text-neon-green">
-                {bounty.payout}
+              <div className="text-2xl font-bold text-neon-green flex gap-2">
+                <span>{bounty.payoutCurrency}</span>
+                <span>{bounty.payoutAmount}</span>
               </div>
             </div>
 
@@ -176,8 +193,8 @@ export function BountyDetailsModal({
           </div>
 
           {/* Links */}
-          {(bounty.codebaseUrl ||
-            bounty.externalWebsite ||
+          {(bounty.codebaseLink ||
+            bounty.websiteLink ||
             bounty.githubIssueLink) && (
             <>
               <Separator className="bg-border" />
@@ -187,9 +204,9 @@ export function BountyDetailsModal({
                   <h3 className="text-lg font-semibold">Resources</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {bounty.codebaseUrl && (
+                  {bounty.codebaseLink && (
                     <a
-                      href={bounty.codebaseUrl}
+                      href={bounty.codebaseLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center space-x-2 p-3 bg-muted/20 rounded-lg border border-border hover:border-neon-blue/50 transition-colors group"
@@ -202,9 +219,9 @@ export function BountyDetailsModal({
                     </a>
                   )}
 
-                  {bounty.externalWebsite && (
+                  {bounty.websiteLink && (
                     <a
-                      href={bounty.externalWebsite}
+                      href={bounty.websiteLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center space-x-2 p-3 bg-muted/20 rounded-lg border border-border hover:border-neon-blue/50 transition-colors group"

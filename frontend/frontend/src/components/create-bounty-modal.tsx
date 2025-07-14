@@ -5,6 +5,7 @@ import { useState } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -22,6 +23,7 @@ import {
 import { MultiSelect } from "@/components/ui/multi-select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useToast } from "@/components/ui/use-toast";
+import { useCreateOrgBounty } from "@/hooks/useCreateOrgBounty";
 
 interface CreateBountyModalProps {
   isOpen: boolean;
@@ -53,7 +55,7 @@ const techOptions = [
   "MongoDB",
 ];
 
-const currencyOptions = ["USDC", "ETH", "USDT", "DAI"];
+const currencyOptions = ["BDAG", "ETH"];
 
 export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
   const [formData, setFormData] = useState({
@@ -61,44 +63,70 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
     description: "",
     techStack: [] as string[],
     payoutAmount: "",
-    payoutCurrency: "USDC",
+    payoutCurrency: "",
     deadline: null as Date | null,
     codebaseUrl: "",
     externalWebsite: "",
     githubIssueLink: "",
   });
+  const { mutate: createBounty } = useCreateOrgBounty();
+
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      return;
+    }
+
+    console.log(token);
+
+    const payload = {
+      title: formData.title,
+      description: formData.description,
+      techStack: formData.techStack,
+      payoutAmount: parseFloat(formData.payoutAmount),
+      payoutCurrency: formData.payoutCurrency,
+      deadline: formData.deadline ?? new Date(),
+      codebaseUrl: formData.codebaseUrl || undefined,
+      externalWebsite: formData.externalWebsite || undefined,
+      githubIssueLink: formData.githubIssueLink || undefined,
+    };
+
+    console.log(payload);
+
     setLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    toast({
-      title: "Bounty Created Successfully",
-      description:
-        "Your bounty has been posted and is now live for hunters to claim.",
-      variant: "success",
-    });
-
-    setLoading(false);
-    onClose();
-
-    // Reset form
-    setFormData({
-      title: "",
-      description: "",
-      techStack: [],
-      payoutAmount: "",
-      payoutCurrency: "USDC",
-      deadline: null,
-      codebaseUrl: "",
-      externalWebsite: "",
-      githubIssueLink: "",
-    });
+    createBounty(
+      { token, payload },
+      {
+        onSuccess: () => {
+          setFormData({
+            title: "",
+            description: "",
+            techStack: [],
+            payoutAmount: "",
+            payoutCurrency: "",
+            deadline: null,
+            codebaseUrl: "",
+            externalWebsite: "",
+            githubIssueLink: "",
+          });
+          onClose();
+        },
+        onError: (error: any) => {
+          console.error(
+            "Bounty creation failed:",
+            error?.response?.data || error
+          );
+        },
+        onSettled: () => {
+          setLoading(false);
+        },
+      }
+    );
   };
 
   return (
@@ -108,6 +136,10 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
           <DialogTitle className="text-3xl font-bold text-neon-blue">
             Create New Bounty
           </DialogTitle>
+          <DialogDescription>
+            Fill out the details to post a new bounty. All fields marked with *
+            are required.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">

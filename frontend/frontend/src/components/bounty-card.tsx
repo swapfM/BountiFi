@@ -6,23 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SubmissionModal } from "@/components/submission-modal";
 import { BountyDetailsModal } from "@/components/bounty-details-modal";
-import { Calendar, DollarSign, Edit, Eye } from "lucide-react";
+import { Calendar, Edit, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 
 interface BountyCardProps {
   bounty: {
-    id: string;
+    id: number;
     title: string;
+    description: string;
     techStack: string[];
-    payout: string;
-    deadline: string;
-    status: "open" | "in-progress" | "completed";
+    payoutAmount: number;
+    payoutCurrency: string;
+    status: string;
+    deadline: Date;
     orgName?: string;
     orgLogo?: string;
     isNew?: boolean;
-    description?: string;
+
     codebaseUrl?: string;
     externalWebsite?: string;
     githubIssueLink?: string;
@@ -45,7 +47,7 @@ export function BountyCard({
   const { toast } = useToast();
 
   const statusColors = {
-    open: "bg-neon-green/20 text-neon-green border-neon-green/30",
+    OPEN: "bg-neon-green/20 text-neon-green border-neon-green/30",
     "in-progress": "bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30",
     completed: "bg-gray-500/20 text-gray-400 border-gray-500/30",
   };
@@ -91,7 +93,7 @@ export function BountyCard({
                   NEW
                 </Badge>
               )}
-              {userType === "hunter" && (
+              {
                 <Button
                   variant="ghost"
                   size="icon"
@@ -100,7 +102,7 @@ export function BountyCard({
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
-              )}
+              }
               {userType === "org" && onEdit && (
                 <Button
                   variant="ghost"
@@ -149,9 +151,9 @@ export function BountyCard({
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center text-neon-green">
-              <DollarSign className="w-4 h-4 mr-1" />
-              <span className="font-semibold">{bounty.payout}</span>
+            <div className="flex items-center text-neon-green gap-2">
+              <span>{bounty.payoutCurrency}</span>
+              <span className="font-semibold">{bounty.payoutAmount}</span>
             </div>
             <div className="flex items-center text-muted-foreground">
               <Calendar className="w-4 h-4 mr-1" />
@@ -217,7 +219,7 @@ export function BountyCard({
         onClose={() => setSubmissionOpen(false)}
       />
       <BountyDetailsModal
-        bounty={bounty}
+        bountyId={bounty.id}
         isOpen={detailsOpen}
         onClose={() => setDetailsOpen(false)}
         onClaim={onClaim}

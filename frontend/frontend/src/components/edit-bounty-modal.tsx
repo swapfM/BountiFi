@@ -23,8 +23,25 @@ import { MultiSelect } from "@/components/ui/multi-select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useToast } from "@/components/ui/use-toast";
 
+interface BountyDetails {
+  id: number;
+  title: string;
+  orgName?: string;
+  orgLogo?: string;
+  techStack: string[];
+  payoutAmount: number;
+  payoutCurrency: string;
+  deadline: Date;
+  status: string;
+  isNew?: boolean;
+  description?: string;
+  codebaseLink?: string;
+  websiteLink?: string;
+  githubIssueLink?: string;
+}
+
 interface EditBountyModalProps {
-  bounty: any;
+  bounty: BountyDetails;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -57,11 +74,11 @@ export function EditBountyModal({
     title: "",
     description: "",
     techStack: [] as string[],
-    payoutAmount: "",
+    payoutAmount: null as number | null,
     payoutCurrency: "BDAG",
     deadline: null as Date | null,
-    codebaseUrl: "",
-    externalWebsite: "",
+    codebaseLink: "",
+    websiteLink: "",
     githubIssueLink: "",
   });
   const [loading, setLoading] = useState(false);
@@ -73,11 +90,11 @@ export function EditBountyModal({
         title: bounty.title || "",
         description: bounty.description || "",
         techStack: bounty.techStack || [],
-        payoutAmount: bounty.payout?.replace(/[^\d]/g, "") || "",
-        payoutCurrency: bounty.payout?.includes("ETH") ? "ETH" : "USDC",
+        payoutAmount: bounty.payoutAmount || null,
+        payoutCurrency: bounty.payoutCurrency?.includes("ETH") ? "ETH" : "BDAG",
         deadline: bounty.deadline ? new Date(bounty.deadline) : null,
-        codebaseUrl: bounty.codebaseUrl || "",
-        externalWebsite: bounty.externalWebsite || "",
+        codebaseLink: bounty.codebaseLink || "",
+        websiteLink: bounty.websiteLink || "",
         githubIssueLink: bounty.githubIssueLink || "",
       });
     }
@@ -164,11 +181,12 @@ export function EditBountyModal({
               <Input
                 id="payoutAmount"
                 type="number"
-                value={formData.payoutAmount}
+                value={formData.payoutAmount ?? ""}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    payoutAmount: e.target.value,
+                    payoutAmount:
+                      e.target.value === "" ? null : Number(e.target.value),
                   }))
                 }
                 className="bg-input border-border focus:border-neon-blue focus:ring-neon-blue/20"
@@ -214,7 +232,7 @@ export function EditBountyModal({
               <Input
                 id="codebaseUrl"
                 type="url"
-                value={formData.codebaseUrl}
+                value={formData.codebaseLink}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
@@ -232,7 +250,7 @@ export function EditBountyModal({
               <Input
                 id="externalWebsite"
                 type="url"
-                value={formData.externalWebsite}
+                value={formData.websiteLink}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
