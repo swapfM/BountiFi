@@ -6,7 +6,9 @@ import { BountyCard } from "@/components/bounty-card";
 import { FilterBar } from "@/components/filter-bar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetOpenBounties } from "@/hooks/useGetOpenBounties";
+import { useHunterAssignBounty } from "@/hooks/useHunterAssignBounty";
 import { useAuth } from "@/context/AuthContext";
+import { useGetHunterAssignedBounties } from "@/hooks/useGetHunterAssignedBounties";
 
 interface bountySummary {
   id: number;
@@ -26,134 +28,48 @@ interface bountySummary {
   githubIssueLink?: string;
 }
 
-const mockAvailableBounties = [
-  {
-    id: "1",
-    title: "Build NFT Marketplace Frontend",
-    orgName: "CryptoDAO",
-    orgLogo: "C",
-    techStack: ["React", "Next.js", "Ethers.js", "IPFS"],
-    payout: "4000 USDC",
-    deadline: "2024-02-18",
-    status: "open" as const,
-    isNew: true,
-    description:
-      "Create a responsive NFT marketplace with advanced filtering and real-time updates. The platform should support multiple blockchain networks and provide seamless user experience for buying, selling, and trading NFTs.",
-    codebaseUrl: "https://github.com/cryptodao/nft-marketplace",
-    externalWebsite: "https://cryptodao.org",
-    githubIssueLink: "https://github.com/cryptodao/nft-marketplace/issues/42",
-  },
-  {
-    id: "2",
-    title: "Smart Contract Security Review",
-    orgName: "DeFi Protocol",
-    orgLogo: "D",
-    techStack: ["Solidity", "Slither", "Mythril", "Foundry"],
-    payout: "6000 USDC",
-    deadline: "2024-02-25",
-    status: "open" as const,
-    isNew: false,
-    description:
-      "Comprehensive security audit of DeFi lending protocol smart contracts. Review includes vulnerability assessment, gas optimization, and best practices implementation.",
-    codebaseUrl: "https://github.com/defiprotocol/lending-contracts",
-    externalWebsite: "https://defiprotocol.finance",
-    githubIssueLink:
-      "https://github.com/defiprotocol/lending-contracts/issues/18",
-  },
-  {
-    id: "3",
-    title: "Integrate Chainlink Oracles",
-    orgName: "Web3 Startup",
-    orgLogo: "W",
-    techStack: ["Solidity", "Chainlink", "Hardhat", "JavaScript"],
-    payout: "3500 USDC",
-    deadline: "2024-02-12",
-    status: "open" as const,
-    isNew: true,
-    description:
-      "Implement price feeds and external data integration using Chainlink oracles. The integration should be robust, secure, and handle edge cases gracefully.",
-    codebaseUrl: "https://github.com/web3startup/oracle-integration",
-    externalWebsite: "https://web3startup.io",
-    githubIssueLink:
-      "https://github.com/web3startup/oracle-integration/issues/29",
-  },
-];
-
-const initialMyTasks = [
-  {
-    id: "4",
-    title: "Optimize Gas Usage in DEX",
-    orgName: "DeFi Exchange",
-    orgLogo: "D",
-    techStack: ["Solidity", "Assembly", "Foundry"],
-    payout: "2500 USDC",
-    deadline: "2024-02-08",
-    status: "in-progress" as const,
-    isNew: false,
-    description:
-      "Reduce gas costs in core DEX functions through assembly optimizations and storage layout improvements.",
-    codebaseUrl: "https://github.com/defiexchange/dex-contracts",
-    externalWebsite: "https://defiexchange.com",
-    githubIssueLink: "https://github.com/defiexchange/dex-contracts/issues/67",
-  },
-];
-
 export default function HunterDashboard() {
-  const [filters, setFilters] = useState({
-    techStack: [] as string[],
-    minReward: 0,
-    maxReward: 10000,
-    newOnly: false,
-  });
-
-  const [claimedBountyIds, setClaimedBountyIds] = useState<string[]>([]);
-  const [myTasks, setMyTasks] = useState(initialMyTasks);
-
-  const handleClaimBounty = (bountyId: string) => {
-    // Find the bounty in available bounties
-    const bountyToClaim = mockAvailableBounties.find((b) => b.id === bountyId);
-    if (bountyToClaim) {
-      // Add to claimed bounties
-      setClaimedBountyIds((prev) => [...prev, bountyId]);
-
-      // Add to my tasks with in-progress status
-      const claimedBounty = {
-        ...bountyToClaim,
-        status: "in-progress" as const,
-      };
-      setMyTasks((prev) => [...prev, claimedBounty]);
-    }
-  };
-
-  // Filter available bounties to exclude claimed ones
-  //   const availableBounties = mockAvailableBounties.filter(
-  //     (bounty) => !claimedBountyIds.includes(bounty.id)
-  //   );
-
-  //   const filteredBounties = availableBounties.filter((bounty) => {
-  //     if (filters.newOnly && !bounty.isNew) return false;
-  //     if (filters.techStack.length > 0) {
-  //       const hasMatchingTech = bounty.techStack.some((tech) =>
-  //         filters.techStack.includes(tech)
-  //       );
-  //       if (!hasMatchingTech) return false;
-  //     }
-  //     const payout = Number.parseInt(bounty.payout.replace(/[^\d]/g, ""));
-  //     if (payout < filters.minReward || payout > filters.maxReward) return false;
-  //     return true;
-  //   });
+  const [openBounties, setOpenBounties] = useState<bountySummary[]>([]);
+  const [myTasks, setMyTasks] = useState<bountySummary[]>([]);
   const { accessToken } = useAuth();
 
-  console.log(accessToken);
-  const [openBounties, setOpenBounties] = useState<bountySummary[]>([]);
+  const { mutate: claimBounty } = useHunterAssignBounty();
 
-  const { data } = useGetOpenBounties(accessToken ?? "");
+  const { data: openBountiesData } = useGetOpenBounties(accessToken ?? "");
+  const { data: assignedBountiesData } = useGetHunterAssignedBounties(
+    accessToken ?? ""
+  );
 
   useEffect(() => {
-    if (data) {
-      setOpenBounties(data);
+    if (openBountiesData) {
+      setOpenBounties(openBountiesData);
     }
-  }, [data]);
+  }, [openBountiesData]);
+
+  useEffect(() => {
+    if (assignedBountiesData) {
+      setMyTasks(assignedBountiesData);
+    }
+  }, [assignedBountiesData]);
+
+  const handleClaimBounty = (bountyId: number) => {
+    claimBounty(
+      { token: accessToken ?? "", bountyId },
+      {
+        onSuccess: () => {
+          setOpenBounties((prev) => prev.filter((b) => b.id !== bountyId));
+
+          const claimed = openBounties.find((b) => b.id === bountyId);
+          if (claimed) {
+            setMyTasks((prev) => [...prev, claimed]);
+          }
+        },
+        onError: (error) => {
+          console.log(error);
+        },
+      }
+    );
+  };
 
   return (
     <HunterLayout>
@@ -184,7 +100,7 @@ export default function HunterDashboard() {
           </TabsList>
 
           <TabsContent value="available" className="space-y-6">
-            <FilterBar filters={filters} onFiltersChange={setFilters} />
+            {/* <FilterBar filters={filters} onFiltersChange={setFilters} /> */}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {openBounties.map((bounty) => (
