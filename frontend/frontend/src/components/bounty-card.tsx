@@ -48,7 +48,7 @@ export function BountyCard({
 
   const statusColors = {
     OPEN: "bg-neon-green/20 text-neon-green border-neon-green/30",
-    "in-progress": "bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30",
+    ASSIGNED: "bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30",
     completed: "bg-gray-500/20 text-gray-400 border-gray-500/30",
   };
 
@@ -61,7 +61,7 @@ export function BountyCard({
     return format(date, "dd/MM/yyyy");
   }
 
-  const handleClaimBounty = () => {
+  const handleAssignBounty = () => {
     if (onClaim) {
       onClaim();
       toast({
@@ -183,19 +183,19 @@ export function BountyCard({
                     </Button>
                     <Button
                       size="sm"
-                      onClick={handleClaimBounty}
+                      onClick={handleAssignBounty}
                       className={cn(
                         "bg-neon-green hover:bg-neon-green/80 text-black font-semibold",
                         glowClass
                       )}
                     >
-                      Claim
+                      Assign
                     </Button>
                   </>
                 )}
 
-              {/* Show only Submit Solution for tasks in progress */}
-              {showSubmit && bounty.status === "in-progress" && (
+              {/* Show only Submit Solution for tasks that r assigned */}
+              {showSubmit && bounty.status === "ASSIGNED" && (
                 <Button
                   size="sm"
                   onClick={() => setSubmissionOpen(true)}

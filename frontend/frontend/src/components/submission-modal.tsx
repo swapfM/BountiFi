@@ -12,10 +12,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import { useHunterSubmitSolution } from "@/hooks/useHunterSubmitSolution";
+
+import { DialogDescription } from "@radix-ui/react-dialog";
+
+interface Bounty {
+  id: number;
+  title: string;
+}
 
 interface SubmissionModalProps {
-  bounty: any;
+  bounty: Bounty;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -26,32 +34,44 @@ export function SubmissionModal({
   onClose,
 }: SubmissionModalProps) {
   const [formData, setFormData] = useState({
-    prUrl: "",
-    notes: "",
+    solutionLink: "",
+    description: "",
   });
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  const { accessToken } = useAuth();
+  const { mutate: submitSolution } = useHunterSubmitSolution();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const payload = {
+      bountyId: bounty.id,
+      solutionLink: formData.solutionLink,
+      description: formData.description,
+    };
 
-    toast({
-      title: "Solution Submitted Successfully",
-      description:
-        "Your submission has been sent for review. You'll be notified once it's reviewed.",
-      variant: "success",
-    });
-
-    setLoading(false);
-    onClose();
-
-    setFormData({
-      prUrl: "",
-      notes: "",
-    });
+    submitSolution(
+      {
+        token: accessToken ?? "",
+        payload: payload,
+      },
+      {
+        onSuccess: () => {
+          setFormData({
+            solutionLink: "",
+            description: "",
+          });
+          onClose();
+        },
+        onError: (error) => {
+          console.error("Submission failed:", error);
+        },
+        onSettled: () => {
+          setLoading(false);
+        },
+      }
+    );
   };
 
   return (
@@ -61,20 +81,24 @@ export function SubmissionModal({
           <DialogTitle className="text-2xl font-bold text-neon-green">
             Submit Solution
           </DialogTitle>
+          <DialogDescription>Submit Your Solution</DialogDescription>
           <p className="text-muted-foreground">{bounty?.title}</p>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="prUrl" className="text-sm font-medium">
+            <Label htmlFor="solutionLink" className="text-sm font-medium">
               GitHub Pull Request URL *
             </Label>
             <Input
-              id="prUrl"
+              id="solutionLink"
               type="url"
-              value={formData.prUrl}
+              value={formData.solutionLink}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, prUrl: e.target.value }))
+                setFormData((prev) => ({
+                  ...prev,
+                  solutionLink: e.target.value,
+                }))
               }
               className="bg-input border-border focus:border-neon-green focus:ring-neon-green/20"
               placeholder="https://github.com/org/project/pull/123"
@@ -83,14 +107,17 @@ export function SubmissionModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes" className="text-sm font-medium">
-              Submission Notes
+            <Label htmlFor="description" className="text-sm font-medium">
+              Submission description
             </Label>
             <Textarea
-              id="notes"
-              value={formData.notes}
+              id="description"
+              value={formData.description}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, notes: e.target.value }))
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
               }
               className="bg-input border-border focus:border-neon-green focus:ring-neon-green/20 min-h-[120px]"
               placeholder="Describe your solution, implementation details, and any additional notes..."
