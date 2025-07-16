@@ -1,14 +1,12 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/context/AuthContext";
-
-const queryClient = new QueryClient();
+import Web3ModalProvider from "@/context/Web3Modal";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <QueryClientProvider client={queryClient}>
+    <Web3ModalProvider>
       <AuthProvider>{children}</AuthProvider>
-    </QueryClientProvider>
+    </Web3ModalProvider>
   );
 }

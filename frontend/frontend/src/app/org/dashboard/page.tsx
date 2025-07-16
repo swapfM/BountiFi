@@ -6,6 +6,7 @@ import { BountyCard } from "@/components/bounty-card";
 import { CreateBountyModal } from "@/components/create-bounty-modal";
 import { EditBountyModal } from "@/components/edit-bounty-modal";
 import { useGetOrgBounties } from "@/hooks/useGetOrgBounties";
+import { useAuth } from "@/context/AuthContext";
 
 interface bountySummary {
   id: number;
@@ -21,7 +22,7 @@ interface bountySummary {
 export default function OrgDashboard() {
   const [createBountyOpen, setCreateBountyOpen] = useState(false);
   const [editBounty, setEditBounty] = useState<bountySummary | null>(null);
-  const token = localStorage.getItem("access_token");
+  const { accessToken: token } = useAuth();
   const [mockBounties, setMockBounties] = useState<bountySummary[]>([]);
 
   const { data } = useGetOrgBounties(token ?? "");

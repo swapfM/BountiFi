@@ -11,8 +11,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ExternalLink, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { Calendar, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import { useOrgApproveSubmission } from "@/hooks/useOrgApproveSubmission";
 
 interface ReviewDrawerProps {
   submission: any;
@@ -28,16 +30,14 @@ export function ReviewDrawer({
   const [reviewNotes, setReviewNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { accessToken } = useAuth();
+  const { mutate: approveSubmission } = useOrgApproveSubmission();
 
   const handleApprove = async () => {
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    toast({
-      title: "Submission Approved! 🎉",
-      description:
-        "Escrow released, payout sent! The hunter has been notified.",
-      variant: "success",
+    approveSubmission({
+      token: accessToken ?? "",
+      submissionId: submission.solutionId,
     });
 
     setLoading(false);
@@ -75,7 +75,7 @@ export function ReviewDrawer({
             <div className="flex items-center space-x-4 text-sm text-muted-foreground">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-full bg-neon-green/20 flex items-center justify-center text-neon-green font-semibold">
-                  {submission.hunterAvatar}
+                  {submission.hunterName[0].toUpperCase()}
                 </div>
                 <span>{submission.hunterName}</span>
               </div>
@@ -88,14 +88,14 @@ export function ReviewDrawer({
             </div>
 
             <Badge className="bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30 w-fit">
-              {submission.status}
+              {submission.solutionStatus}
             </Badge>
           </div>
         </SheetHeader>
 
         <div className="space-y-6">
           {/* PR Preview */}
-          <div className="space-y-3">
+          {/* <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Pull Request</Label>
               <a
@@ -128,13 +128,15 @@ export function ReviewDrawer({
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Submission Notes */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">Hunter&apos;s Notes</Label>
             <div className="bg-muted/20 rounded-lg p-4 border border-border">
-              <p className="text-sm leading-relaxed">{submission.notes}</p>
+              <p className="text-sm leading-relaxed">
+                {submission.solutionDescription}
+              </p>
             </div>
           </div>
 
