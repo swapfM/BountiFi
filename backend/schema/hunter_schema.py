@@ -1,8 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class CreateSolutionSchema(BaseModel):
-    bounty_id: int
+    bounty_id: int = Field(..., alias="bountyId")
     description: str
-    solution_file: str | None = None
-    solution_link: str | None = None
+    solution_file: Optional[str] = Field(None, alias="solutionFile")
+    solution_link: Optional[str] = Field(alias="solutionLink")

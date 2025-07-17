@@ -24,7 +24,7 @@ router = APIRouter(prefix="/organization", tags=["Organization"])
 limiter = Limiter(key_func=get_remote_address)
 
 
-@router.post("/create_bounty", response_model=SuccessMessage | ErrorMessage)
+@router.post("/create_bounty")
 @limiter.limit("5/minute")
 async def create_bounty_api(
     request: Request,
@@ -194,6 +194,61 @@ async def get_bounty_solutions_api(
         return await organization_api.get_bounty_solution(bounty_id=bounty_id)
     except Exception as e:
         logger.error(f"Error fetching solutions for bounty {bounty_id}: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
+        )
+
+
+@router.get("/pending_submissions")
+async def get_pending_submissions_api(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        if current_user.user_type.value != "ORGANIZATION":
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Only organizations can view their bounties",
+                },
+            )
+        organization_api = OrganizationAPI(db)
+        return await organization_api.get_pending_submissions(
+            organization_id=current_user.id
+        )
+    except Exception as e:
+        logger.error(f"Error fetching submissions {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
+        )
+
+
+@router.get("/approve_submission/{submission_id}")
+async def get_approve_submissions_api(
+    request: Request,
+    submission_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        if current_user.user_type.value != "ORGANIZATION":
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Only organizations can approve their bounties",
+                },
+            )
+
+        organization_api = OrganizationAPI(db)
+        return await organization_api.approve_submission(submission_id=submission_id)
+
+    except Exception as e:
+        logger.error(f"Error approving submissions {str(e)}")
         return JSONResponse(
             status_code=500,
             content={"status": "error", "message": "Something went wrong"},

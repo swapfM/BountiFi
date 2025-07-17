@@ -105,6 +105,7 @@ class BountySolution(Base):
     id = Column(Integer, primary_key=True, index=True)
     bounty_id = Column(Integer, ForeignKey("bounties.id"), nullable=False)
     hunter_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
     description = Column(Text, nullable=False)
     solution_file = Column(String(255), nullable=True)
     solution_link = Column(String(255), nullable=True)

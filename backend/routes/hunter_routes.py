@@ -43,7 +43,7 @@ async def get_open_bounties_api(
         )
 
 
-@router.get("/bounty/{bounty_id}", response_model=BountyGet | ErrorMessage)
+@router.get("/bounty/{bounty_id}")
 @limiter.limit("5/minute")
 async def get_bounty_by_id_api(
     request: Request,
