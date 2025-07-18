@@ -23,42 +23,6 @@ interface PendingSubmission {
   solutionStatus: string;
 }
 
-const mockSubmissions = [
-  {
-    id: "1",
-    bountyTitle: "Implement Smart Contract Audit System",
-    hunterName: "alex.eth",
-    hunterAvatar: "A",
-    prUrl: "https://github.com/org/project/pull/156",
-    notes:
-      "Implemented comprehensive audit system with automated vulnerability detection using Slither and custom rules. Added unit tests and documentation.",
-    submittedAt: "2024-01-15T10:30:00Z",
-    status: "pending" as const,
-  },
-  {
-    id: "2",
-    bountyTitle: "Build DeFi Dashboard UI",
-    hunterName: "sarah.dev",
-    hunterAvatar: "S",
-    prUrl: "https://github.com/org/defi-ui/pull/89",
-    notes:
-      "Created responsive dashboard with real-time price feeds, portfolio tracking, and transaction history. Implemented dark theme and mobile optimization.",
-    submittedAt: "2024-01-14T15:45:00Z",
-    status: "pending" as const,
-  },
-  {
-    id: "3",
-    bountyTitle: "Optimize Gas Usage in DEX",
-    hunterName: "mike.sol",
-    hunterAvatar: "M",
-    prUrl: "https://github.com/org/dex/pull/234",
-    notes:
-      "Reduced gas costs by 35% through assembly optimizations and storage layout improvements. All tests passing.",
-    submittedAt: "2024-01-13T09:15:00Z",
-    status: "approved" as const,
-  },
-];
-
 export default function ReviewSubmissions() {
   const { accessToken } = useAuth();
   const { data } = useGetOrgPendingBounties(accessToken ?? "");
@@ -67,23 +31,26 @@ export default function ReviewSubmissions() {
     []
   );
 
+  const [selectedSubmission, setSelectedSubmission] =
+    useState<PendingSubmission | null>(null);
+
   useEffect(() => {
     if (data) {
       setPendingBounties(data);
       console.log(data);
     }
   }, [data]);
-  const [selectedSubmission, setSelectedSubmission] = useState<
-    (typeof mockSubmissions)[0] | null
-  >(null);
+  //   const [selectedSubmission, setSelectedSubmission] = useState<
+  //     (typeof mockSubmissions)[0] | null
+  //   >(null);
 
   //   const pendingBounties = mockSubmissions.filter(
   //     (s) => s.status === "pending"
   //   );
 
-  const reviewedSubmissions = mockSubmissions.filter(
-    (s) => s.status !== "pending"
-  );
+  //   const reviewedSubmissions = mockSubmissions.filter(
+  //     (s) => s.status !== "pending"
+  //   );
 
   return (
     <OrgLayout>
@@ -173,7 +140,7 @@ export default function ReviewSubmissions() {
           </div>
         </div>
 
-        {/* Reviewed Submissions */}
+        {/* Reviewed Submissions
         {reviewedSubmissions.length > 0 && (
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold text-muted-foreground">
@@ -211,7 +178,7 @@ export default function ReviewSubmissions() {
               ))}
             </div>
           </div>
-        )}
+        )} */}
 
         {pendingBounties.length === 0 && (
           <div className="text-center py-12">

@@ -10,12 +10,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User, Settings, LogOut, Trophy, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export function HunterNavbar() {
   const router = useRouter();
+  const { logout } = useAuth();
 
   const handleSignOut = () => {
-    localStorage.removeItem("bountifi_user");
+    logout();
     router.push("/");
   };
 
@@ -39,6 +41,7 @@ export function HunterNavbar() {
       </div>
 
       <div className="flex items-center space-x-4">
+        <w3m-button />
         <div className="flex items-center space-x-2 text-sm">
           <Trophy className="w-4 h-4 text-neon-yellow" />
           <span className="text-muted-foreground">Rank:</span>

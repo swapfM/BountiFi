@@ -9,6 +9,7 @@ import { useGetOpenBounties } from "@/hooks/useGetOpenBounties";
 import { useHunterAssignBounty } from "@/hooks/useHunterAssignBounty";
 import { useAuth } from "@/context/AuthContext";
 import { useGetHunterAssignedBounties } from "@/hooks/useGetHunterAssignedBounties";
+import { useAssignHunter } from "@/hooks/contracts/useAssignHunter";
 
 interface bountySummary {
   id: number;
@@ -32,7 +33,7 @@ export default function HunterDashboard() {
   const [openBounties, setOpenBounties] = useState<bountySummary[]>([]);
   const [myTasks, setMyTasks] = useState<bountySummary[]>([]);
   const { accessToken } = useAuth();
-
+  const { assign } = useAssignHunter();
   const { mutate: claimBounty } = useHunterAssignBounty();
 
   const { data: openBountiesData } = useGetOpenBounties(accessToken ?? "");
@@ -58,6 +59,7 @@ export default function HunterDashboard() {
       {
         onSuccess: () => {
           setOpenBounties((prev) => prev.filter((b) => b.id !== bountyId));
+          assign(bountyId);
 
           const claimed = openBounties.find((b) => b.id === bountyId);
           if (claimed) {

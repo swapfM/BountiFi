@@ -15,6 +15,7 @@ import { Calendar, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { useOrgApproveSubmission } from "@/hooks/useOrgApproveSubmission";
+import { useApproveSolution } from "@/hooks/contracts/useApproveSolution";
 
 interface ReviewDrawerProps {
   submission: any;
@@ -32,9 +33,11 @@ export function ReviewDrawer({
   const { toast } = useToast();
   const { accessToken } = useAuth();
   const { mutate: approveSubmission } = useOrgApproveSubmission();
+  const { approve } = useApproveSolution();
 
   const handleApprove = async () => {
     setLoading(true);
+    approve(submission.bountyId);
     approveSubmission({
       token: accessToken ?? "",
       submissionId: submission.solutionId,

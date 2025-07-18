@@ -24,6 +24,8 @@ import { MultiSelect } from "@/components/ui/multi-select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useToast } from "@/components/ui/use-toast";
 import { useCreateOrgBounty } from "@/hooks/useCreateOrgBounty";
+import { useAuth } from "@/context/AuthContext";
+import { useFundBounty } from "@/hooks/contracts/useFundBounty";
 
 interface CreateBountyModalProps {
   isOpen: boolean;
@@ -58,6 +60,11 @@ const techOptions = [
 const currencyOptions = ["BDAG", "ETH"];
 
 export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
+  const { mutateAsync: createBounty } = useCreateOrgBounty();
+  const { accessToken: token } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { fund } = useFundBounty();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -69,19 +76,11 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
     externalWebsite: "",
     githubIssueLink: "",
   });
-  const { mutate: createBounty } = useCreateOrgBounty();
-
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      return;
-    }
-
-    console.log(token);
+    if (!token) return;
 
     const payload = {
       title: formData.title,
@@ -95,38 +94,34 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
       githubIssueLink: formData.githubIssueLink || undefined,
     };
 
-    console.log(payload);
-
     setLoading(true);
 
-    createBounty(
-      { token, payload },
-      {
-        onSuccess: () => {
-          setFormData({
-            title: "",
-            description: "",
-            techStack: [],
-            payoutAmount: "",
-            payoutCurrency: "",
-            deadline: null,
-            codebaseUrl: "",
-            externalWebsite: "",
-            githubIssueLink: "",
-          });
-          onClose();
-        },
-        onError: (error: any) => {
-          console.error(
-            "Bounty creation failed:",
-            error?.response?.data || error
-          );
-        },
-        onSettled: () => {
-          setLoading(false);
-        },
-      }
-    );
+    try {
+      const data = await createBounty({ token, payload });
+
+      await fund(data.bounty.id, data.bounty.payout_amount.toString());
+
+      setFormData({
+        title: "",
+        description: "",
+        techStack: [],
+        payoutAmount: "",
+        payoutCurrency: "",
+        deadline: null,
+        codebaseUrl: "",
+        externalWebsite: "",
+        githubIssueLink: "",
+      });
+
+      onClose();
+    } catch (error: any) {
+      console.error(
+        "Bounty creation or funding failed:",
+        error?.response?.data || error?.message || error
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

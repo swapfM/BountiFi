@@ -195,7 +195,7 @@ export function BountyCard({
                 )}
 
               {/* Show only Submit Solution for tasks that r assigned */}
-              {showSubmit && bounty.status === "ASSIGNED" && (
+              {userType == "HUNTER" && bounty.status === "ASSIGNED" && (
                 <Button
                   size="sm"
                   onClick={() => setSubmissionOpen(true)}

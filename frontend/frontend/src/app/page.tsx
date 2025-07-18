@@ -26,7 +26,6 @@ export default function Home() {
               <h1 className="text-7xl font-bold tracking-tight bg-gradient-to-r from-neon-blue via-white to-neon-green bg-clip-text text-transparent">
                 BountiFi
               </h1>
-              {/* <span className="text-lg text-muted-foreground font-mono tracking-wider ml-1">v2.0</span> */}
             </div>
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
