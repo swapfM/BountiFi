@@ -14,6 +14,7 @@ export function useApproveSolution() {
       abi,
       functionName: "approveSolution",
       args: [bountyId],
+      gas: BigInt(1000000),
     });
   };
 

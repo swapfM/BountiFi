@@ -1,25 +1,22 @@
-import { useAccount, useConfig, useWriteContract } from "wagmi";
+import { useWriteContract } from "wagmi";
 import { abi, contractAddress } from "@/constants";
 import { parseEther } from "viem";
 
 export function useFundBounty() {
-  const config = useConfig();
-  const { address } = useAccount();
-  const { writeContract, isPending, error } = useWriteContract({ config });
+  const { writeContractAsync, isPending, error } = useWriteContract();
 
   const fund = async (bountyId: number, payoutAmount: number) => {
     try {
-      console.log(bountyId, payoutAmount);
-      await writeContract({
+      await writeContractAsync({
         address: contractAddress,
         abi,
         functionName: "fundBounty",
         args: [bountyId],
         value: parseEther(payoutAmount.toString()),
-        account: address,
+        gas: BigInt(1000000),
       });
     } catch (err) {
-      console.error("Error funding bounty:", err);
+      console.error("Failed to fund bounty:", err);
     }
   };
 

@@ -14,6 +14,7 @@ export function useAssignHunter() {
       abi,
       functionName: "assignHunter",
       args: [bountyId],
+      gas: BigInt(1000000),
     });
   };
 
