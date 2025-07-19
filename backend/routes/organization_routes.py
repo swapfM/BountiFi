@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
 from api.organization_api import OrganizationAPI
-from schema.organization_schema import BountyCreate
+from schema.organization_schema import BountyCreate, TransactionCreateSchema
 from schema.common_schema import (
     BountyGet,
     BountySummary,
@@ -249,6 +249,34 @@ async def get_approve_submissions_api(
 
     except Exception as e:
         logger.error(f"Error approving submissions {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
+        )
+
+
+@router.post("/create_transaction")
+async def create_transaction_api(
+    request: Request,
+    transaction_data: TransactionCreateSchema,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        if current_user.user_type.value != "ORGANIZATION":
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Not Allowed",
+                },
+            )
+        organization_api = OrganizationAPI(db)
+        return await organization_api.create_transaction(
+            transaction_data, current_user=current_user
+        )
+    except Exception as e:
+        logger.error(f"Error creating transaction {str(e)}")
         return JSONResponse(
             status_code=500,
             content={"status": "error", "message": "Something went wrong"},

@@ -12,6 +12,7 @@ from sqlalchemy import (
     JSON,
     Boolean,
     Text,
+    Float,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -21,6 +22,17 @@ from .database import Base
 class UserType(enum.Enum):
     ORGANIZATION = "ORGANIZATION"
     HUNTER = "HUNTER"
+
+
+class TransactionType(enum.Enum):
+    FUND_BOUNTY = "FUND_BOUNTY"
+    RECEIVE_PAYOUT = "RECEIVE_PAYOUT"
+
+
+class TransactionStatus(enum.Enum):
+    PENDING = "PENDING"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
 
 
 class BountyStatus(enum.Enum):
@@ -55,6 +67,8 @@ class User(Base):
     assigned_bounties = relationship(
         "Bounty", foreign_keys="Bounty.assigned_to", back_populates="hunter"
     )
+
+    transactions = relationship("Transaction", back_populates="user")
 
     solutions = relationship("BountySolution", back_populates="hunter")
 
@@ -126,3 +140,18 @@ class BountySolution(Base):
             f"<BountySolution(id={self.id}, bounty_id={self.bounty_id}, "
             f"hunter_id={self.hunter_id})>"
         )
+
+
+class Transaction(Base):
+    __tablename__ = "transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    bounty_title = Column(String(255), nullable=False)
+    transaction_hash = Column(String(255), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, default=func.now())
+    transaction_type = Column(Enum(TransactionType), nullable=False)
+    transaction_status = Column(Enum(TransactionStatus), nullable=False)
+    amount = Column(Float, nullable=False)
+
+    user = relationship("User", back_populates="transactions")

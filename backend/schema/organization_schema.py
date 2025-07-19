@@ -23,3 +23,26 @@ class BountyCreate(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+from pydantic import BaseModel
+from enum import Enum
+
+
+class TransactionTypeEnum(str, Enum):
+    FUND_BOUNTY = "FUND_BOUNTY"
+    RECEIVE_PAYOUT = "RECEIVE_PAYOUT"
+
+
+class TransactionStatusEnum(str, Enum):
+    PENDING = "PENDING"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+
+
+class TransactionCreateSchema(BaseModel):
+    bounty_title: str
+    transaction_hash: str
+    transaction_type: TransactionTypeEnum
+    transaction_status: TransactionStatusEnum
+    amount: float

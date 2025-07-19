@@ -1,9 +1,16 @@
 from db.models import Bounty
 from sqlalchemy.orm import Session, joinedload
 from schema.common_schema import BountySummary
-from schema.organization_schema import BountyCreate
+from schema.organization_schema import BountyCreate, TransactionCreateSchema
 from fastapi import HTTPException, status
-from db.models import User, Bounty, BountyStatus, BountySolution, BountySolutionStatus
+from db.models import (
+    User,
+    Bounty,
+    BountyStatus,
+    BountySolution,
+    BountySolutionStatus,
+    Transaction,
+)
 
 
 class OrganizationAPI:
@@ -154,5 +161,20 @@ class OrganizationAPI:
                 "bounty_id": bounty.id,
                 "new_status": bounty.status.value,
             }
+        except Exception as e:
+            return {"status": "error", "message": f"Server error: {str(e)}"}
+
+    async def create_transaction(
+        self, transaction_data: TransactionCreateSchema, current_user: User
+    ):
+        try:
+            print(type(transaction_data))
+            new_transaction = Transaction(
+                **transaction_data.dict(), user_id=current_user.id
+            )
+            self.db.add(new_transaction)
+            self.db.commit()
+            self.db.refresh(new_transaction)
+
         except Exception as e:
             return {"status": "error", "message": f"Server error: {str(e)}"}
