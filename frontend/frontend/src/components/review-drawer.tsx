@@ -37,7 +37,12 @@ export function ReviewDrawer({
 
   const handleApprove = async () => {
     setLoading(true);
-    approve(submission.bountyId);
+    approve(
+      submission.bountyId,
+      submission.bountyTitle,
+      submission.payoutAmount,
+      submission.hunterId
+    );
     approveSubmission({
       token: accessToken ?? "",
       submissionId: submission.solutionId,

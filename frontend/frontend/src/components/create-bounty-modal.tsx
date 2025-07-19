@@ -99,7 +99,12 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
     try {
       const data = await createBounty({ token, payload });
 
-      await fund(data.bounty.id, data.bounty.payout_amount.toString());
+      await fund(
+        data.bounty.id,
+        data.bounty.payout_amount.toString(),
+        data.bounty.title,
+        token
+      );
 
       setFormData({
         title: "",

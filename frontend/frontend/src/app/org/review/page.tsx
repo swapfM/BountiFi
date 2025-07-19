@@ -12,8 +12,9 @@ import { useGetOrgPendingBounties } from "@/hooks/useGetOrgPendingBounties";
 
 interface PendingSubmission {
   bountyId: number;
-
+  hunterId: number;
   bountyTitle: string;
+  payoutAmount: number;
   bountyDescription: string;
   solutionDescription: string;
   solutionLink: string;
@@ -40,17 +41,6 @@ export default function ReviewSubmissions() {
       console.log(data);
     }
   }, [data]);
-  //   const [selectedSubmission, setSelectedSubmission] = useState<
-  //     (typeof mockSubmissions)[0] | null
-  //   >(null);
-
-  //   const pendingBounties = mockSubmissions.filter(
-  //     (s) => s.status === "pending"
-  //   );
-
-  //   const reviewedSubmissions = mockSubmissions.filter(
-  //     (s) => s.status !== "pending"
-  //   );
 
   return (
     <OrgLayout>
@@ -139,46 +129,6 @@ export default function ReviewSubmissions() {
             ))}
           </div>
         </div>
-
-        {/* Reviewed Submissions
-        {reviewedSubmissions.length > 0 && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-muted-foreground">
-              Recently Reviewed
-            </h2>
-
-            <div className="space-y-4">
-              {reviewedSubmissions.map((submission) => (
-                <Card
-                  key={submission.id}
-                  className="p-6 bg-card/30 backdrop-blur-sm border-border/50"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-3">
-                        <h3 className="text-lg font-semibold text-muted-foreground">
-                          {submission.bountyTitle}
-                        </h3>
-                        <Badge className="bg-neon-green/20 text-neon-green border-neon-green/30">
-                          {submission.status}
-                        </Badge>
-                      </div>
-
-                      <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                        <span>{submission.hunterName}</span>
-                        <span>
-                          {new Date(
-                            submission.submittedAt
-                          ).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )} */}
 
         {pendingBounties.length === 0 && (
           <div className="text-center py-12">

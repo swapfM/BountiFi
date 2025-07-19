@@ -18,6 +18,7 @@ import { Building2, User } from "lucide-react";
 import { loginUser, signupUser } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import { useLoader } from "@/hooks/useLoader";
 
 interface AuthModalProps {
   type: "login" | "signup" | null;
@@ -33,6 +34,11 @@ export function AuthModal({ type, isOpen, onClose }: AuthModalProps) {
     "ORGANIZATION" | "HUNTER" | null
   >(null);
   const [loading, setLoading] = useState(false);
+  const { Loader } = useLoader({
+    text: type === "signup" ? "Creating account..." : "Signing in...",
+    variant: "full-screen",
+    color: type === "signup" ? "green" : "blue",
+  });
   const router = useRouter();
   const { setName: setAuthName, setAccessToken, setUserType } = useAuth();
 
@@ -97,6 +103,7 @@ export function AuthModal({ type, isOpen, onClose }: AuthModalProps) {
   };
 
   if (!type) return null;
+  if (loading) return <Loader />;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

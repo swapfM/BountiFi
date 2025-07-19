@@ -107,10 +107,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     disconnect();
   }, [disconnect]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <AuthContext.Provider
       value={{

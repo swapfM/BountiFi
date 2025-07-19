@@ -5,9 +5,20 @@ import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/AuthModal";
 import { Zap } from "lucide-react";
 import FuturisticBackground from "@/components/FuturisticBackground";
+import { useLoader } from "@/hooks/useLoader";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
   const [authModal, setAuthModal] = useState<"login" | "signup" | null>(null);
+  const { isLoading } = useAuth();
+
+  const { Loader } = useLoader({
+    text: "Initializing session...",
+    variant: "full-screen",
+    color: "blue",
+  });
+
+  if (isLoading) return <Loader />;
 
   return (
     <div className="min-h-screen flex items-center justify-center relative">

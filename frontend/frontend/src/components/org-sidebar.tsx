@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
+  BadgeDollarSign,
 } from "lucide-react";
 
 interface OrgSidebarProps {
@@ -20,6 +21,7 @@ interface OrgSidebarProps {
 const menuItems = [
   { icon: Target, label: "My Bounties", href: "/org/dashboard" },
   { icon: FileCheck, label: "Review Submissions", href: "/org/review" },
+  { icon: BadgeDollarSign, label: "Transactions", href: "/org/transactions" },
 ];
 
 export function OrgSidebar({ collapsed, onToggle }: OrgSidebarProps) {
