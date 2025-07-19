@@ -281,3 +281,29 @@ async def create_transaction_api(
             status_code=500,
             content={"status": "error", "message": "Something went wrong"},
         )
+
+
+@router.get("/transactions")
+async def get_transactions_api(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        if current_user.user_type.value != "ORGANIZATION":
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Not Allowed",
+                },
+            )
+        organization_api = OrganizationAPI(db)
+        return await organization_api.get_transactions(current_user=current_user)
+
+    except Exception as e:
+        logger.error(f"Error getting transactions {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
+        )

@@ -168,7 +168,7 @@ class OrganizationAPI:
         self, transaction_data: TransactionCreateSchema, current_user: User
     ):
         try:
-            print(type(transaction_data))
+
             new_transaction = Transaction(
                 **transaction_data.dict(), user_id=current_user.id
             )
@@ -176,5 +176,16 @@ class OrganizationAPI:
             self.db.commit()
             self.db.refresh(new_transaction)
 
+        except Exception as e:
+            return {"status": "error", "message": f"Server error: {str(e)}"}
+
+    async def get_transactions(self, current_user: User):
+        try:
+            transactions = (
+                self.db.query(Transaction)
+                .filter(Transaction.user_id == current_user.id)
+                .all()
+            )
+            return transactions
         except Exception as e:
             return {"status": "error", "message": f"Server error: {str(e)}"}
