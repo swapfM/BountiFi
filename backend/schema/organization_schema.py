@@ -41,8 +41,9 @@ class TransactionStatusEnum(str, Enum):
 
 
 class TransactionCreateSchema(BaseModel):
-    bounty_title: str
-    transaction_hash: str
-    transaction_type: TransactionTypeEnum
-    transaction_status: TransactionStatusEnum
-    amount: float
+    bounty_title: str = Field(alias="bountyTitle")
+    transaction_hash: str = Field(alias="transactionHash")
+    transaction_type: TransactionTypeEnum = Field(alias="transactionType")
+    transaction_status: TransactionStatusEnum = Field(alias="transactionStatus")
+    amount: float = Field(alias="payoutAmount")
+    user_id: Optional[int] = Field(default=None, alias="hunterId")

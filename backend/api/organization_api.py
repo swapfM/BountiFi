@@ -1,7 +1,11 @@
 from db.models import Bounty
 from sqlalchemy.orm import Session, joinedload
 from schema.common_schema import BountySummary
-from schema.organization_schema import BountyCreate, TransactionCreateSchema
+from schema.organization_schema import (
+    BountyCreate,
+    TransactionCreateSchema,
+    TransactionTypeEnum,
+)
 from fastapi import HTTPException, status
 from db.models import (
     User,
@@ -131,7 +135,9 @@ class OrganizationAPI:
                                 "bounty_id": bounty.id,
                                 "bounty_title": bounty.title,
                                 "bounty_description": bounty.description,
+                                "payout_amount": bounty.payout_amount,
                                 "hunter_name": solution.hunter.name,
+                                "hunter_id": solution.hunter.id,
                                 "submitted_at": solution.updated_at,
                                 "solution_id": solution.id,
                                 "solution_description": solution.description,
@@ -168,24 +174,23 @@ class OrganizationAPI:
         self, transaction_data: TransactionCreateSchema, current_user: User
     ):
         try:
+            data = transaction_data.dict()
 
-            new_transaction = Transaction(
-                **transaction_data.dict(), user_id=current_user.id
+            user_id = (
+                data["user_id"]
+                if data["transaction_type"] == TransactionTypeEnum.RECEIVE_PAYOUT
+                and data.get("user_id") is not None
+                else current_user.id
             )
+
+            data.pop("user_id", None)
+            new_transaction = Transaction(**data, user_id=user_id)
+
             self.db.add(new_transaction)
             self.db.commit()
             self.db.refresh(new_transaction)
 
-        except Exception as e:
-            return {"status": "error", "message": f"Server error: {str(e)}"}
+            return {"status": "success", "transaction": new_transaction}
 
-    async def get_transactions(self, current_user: User):
-        try:
-            transactions = (
-                self.db.query(Transaction)
-                .filter(Transaction.user_id == current_user.id)
-                .all()
-            )
-            return transactions
         except Exception as e:
             return {"status": "error", "message": f"Server error: {str(e)}"}
