@@ -1,10 +1,10 @@
 import { useWriteContract } from "wagmi";
-import { abi, contractAddress } from "@/constants";
+import { BOUNTY_ESCROW_ABI, BOUNTY_ESCROW_CONTRACT_ADDRESS } from "@/constants";
 import axios from "axios";
 
 const BASE_URL = process.env.NEXT_PUBLIC_FASTAPI_HOST;
 
-export function useApproveSubmission() {
+export function useApproveSolution() {
   const { writeContractAsync, isPending, error } = useWriteContract();
 
   const approve = async (
@@ -18,8 +18,8 @@ export function useApproveSubmission() {
 
     try {
       txHash = await writeContractAsync({
-        address: contractAddress,
-        abi,
+        address: BOUNTY_ESCROW_CONTRACT_ADDRESS,
+        abi: BOUNTY_ESCROW_ABI,
         functionName: "approveSolution",
         args: [bountyId],
         gas: BigInt(1_000_000),

@@ -1,4 +1,3 @@
-// hooks/useLoader.ts
 import { useState } from "react";
 import FuturisticLoader from "@/components/FuturisticLoader";
 

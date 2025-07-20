@@ -1,5 +1,5 @@
 import { useWriteContract } from "wagmi";
-import { abi, contractAddress } from "@/constants";
+import { BOUNTY_ESCROW_ABI, BOUNTY_ESCROW_CONTRACT_ADDRESS } from "@/constants";
 
 export function useAssignHunter() {
   const { writeContract, isPending, error, data } = useWriteContract();
@@ -10,8 +10,8 @@ export function useAssignHunter() {
     }
 
     writeContract({
-      address: contractAddress,
-      abi,
+      address: BOUNTY_ESCROW_CONTRACT_ADDRESS,
+      abi: BOUNTY_ESCROW_ABI,
       functionName: "assignHunter",
       args: [bountyId],
       gas: BigInt(1000000),

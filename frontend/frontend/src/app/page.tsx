@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/AuthModal";
 import { Zap } from "lucide-react";
@@ -10,18 +10,21 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
   const [authModal, setAuthModal] = useState<"login" | "signup" | null>(null);
+
   const { isLoading } = useAuth();
 
-  const { Loader } = useLoader({
+  const { Loader, setLoading } = useLoader({
     text: "Initializing session...",
     variant: "full-screen",
     color: "blue",
   });
-
-  if (isLoading) return <Loader />;
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
 
   return (
     <div className="min-h-screen flex items-center justify-center relative">
+      <Loader />
       <FuturisticBackground />
 
       <div className="text-center space-y-12 z-10 px-4">

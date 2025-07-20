@@ -1,6 +1,6 @@
 "use client";
 
-import { Zap, Loader2 } from "lucide-react";
+import { Zap } from "lucide-react";
 
 interface FuturisticLoaderProps {
   size?: "sm" | "md" | "lg";
@@ -148,65 +148,6 @@ export default function FuturisticLoader({
           {text}
         </span>
       )}
-    </div>
-  );
-}
-
-// Alternative spinner-style loader
-export function SpinnerLoader({
-  size = "md",
-  color = "blue",
-}: {
-  size?: "sm" | "md" | "lg";
-  color?: "blue" | "green" | "yellow";
-}) {
-  const sizeClasses = {
-    sm: "w-6 h-6",
-    md: "w-8 h-8",
-    lg: "w-12 h-12",
-  };
-
-  const colorClasses = {
-    blue: "text-neon-blue neon-glow",
-    green: "text-neon-green neon-glow-green",
-    yellow: "text-neon-yellow neon-glow-yellow",
-  };
-
-  return (
-    <div className="relative">
-      <Loader2
-        className={`${sizeClasses[size]} animate-spin ${colorClasses[color]}`}
-      />
-      <div
-        className={`absolute inset-0 rounded-full bg-gradient-to-r from-neon-blue to-neon-green opacity-20 blur-sm animate-pulse`}
-      ></div>
-    </div>
-  );
-}
-
-// Pulse loader for buttons
-export function PulseLoader({
-  color = "blue",
-}: {
-  color?: "blue" | "green" | "yellow";
-}) {
-  const colorMap = {
-    blue: "bg-neon-blue",
-    green: "bg-neon-green",
-    yellow: "bg-neon-yellow",
-  };
-
-  return (
-    <div className="flex items-center space-x-2">
-      <div
-        className={`w-2 h-2 ${colorMap[color]} rounded-full animate-bounce [animation-delay:-0.3s]`}
-      ></div>
-      <div
-        className={`w-2 h-2 ${colorMap[color]} rounded-full animate-bounce [animation-delay:-0.15s]`}
-      ></div>
-      <div
-        className={`w-2 h-2 ${colorMap[color]} rounded-full animate-bounce`}
-      ></div>
     </div>
   );
 }

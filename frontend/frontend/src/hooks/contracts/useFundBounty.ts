@@ -1,5 +1,5 @@
 import { useWriteContract } from "wagmi";
-import { abi, contractAddress } from "@/constants";
+import { BOUNTY_ESCROW_ABI, BOUNTY_ESCROW_CONTRACT_ADDRESS } from "@/constants";
 import { parseEther } from "viem";
 import axios from "axios";
 
@@ -18,8 +18,8 @@ export function useFundBounty() {
 
     try {
       txHash = await writeContractAsync({
-        address: contractAddress,
-        abi,
+        address: BOUNTY_ESCROW_CONTRACT_ADDRESS,
+        abi: BOUNTY_ESCROW_ABI,
         functionName: "fundBounty",
         args: [bountyId],
         value: parseEther(payoutAmount.toString()),

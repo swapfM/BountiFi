@@ -1,6 +1,13 @@
-import { abi } from "./abi";
+import { BOUNTIFI_BADGE_ABI, BOUNTY_ESCROW_ABI } from "./abi";
 
-const contractAddress = process.env
+const BOUNTY_ESCROW_CONTRACT_ADDRESS = process.env
   .NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+const BOUNTIFI_BADGE_CONTRACT_ADDRESS = process.env
+  .NEXT_PUBLIC_NFT_CONTRACT_ADDRESS as `0x${string}`;
 
-export { abi, contractAddress };
+export {
+  BOUNTIFI_BADGE_ABI,
+  BOUNTY_ESCROW_ABI,
+  BOUNTY_ESCROW_CONTRACT_ADDRESS,
+  BOUNTIFI_BADGE_CONTRACT_ADDRESS,
+};

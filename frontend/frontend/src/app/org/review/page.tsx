@@ -9,6 +9,7 @@ import { ReviewDrawer } from "@/components/review-drawer";
 import { ExternalLink, User, Calendar } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useGetOrgPendingBounties } from "@/hooks/useGetOrgPendingBounties";
+import { useLoader } from "@/hooks/useLoader";
 
 interface PendingSubmission {
   bountyId: number;
@@ -27,6 +28,10 @@ interface PendingSubmission {
 export default function ReviewSubmissions() {
   const { accessToken } = useAuth();
   const { data } = useGetOrgPendingBounties(accessToken ?? "");
+  const { Loader, loading, setLoading } = useLoader({
+    text: "Loading...",
+    variant: "full-screen",
+  });
 
   const [pendingBounties, setPendingBounties] = useState<PendingSubmission[]>(
     []
@@ -38,10 +43,13 @@ export default function ReviewSubmissions() {
   useEffect(() => {
     if (data) {
       setPendingBounties(data);
-      console.log(data);
+      setLoading(false);
     }
-  }, [data]);
+  }, [data, setLoading]);
 
+  if (loading) {
+    return <Loader />;
+  }
   return (
     <OrgLayout>
       <div className="space-y-8">

@@ -7,6 +7,7 @@ import { CreateBountyModal } from "@/components/create-bounty-modal";
 import { EditBountyModal } from "@/components/edit-bounty-modal";
 import { useGetOrgBounties } from "@/hooks/useGetOrgBounties";
 import { useAuth } from "@/context/AuthContext";
+import { useLoader } from "@/hooks/useLoader";
 
 interface bountySummary {
   id: number;
@@ -24,14 +25,23 @@ export default function OrgDashboard() {
   const [editBounty, setEditBounty] = useState<bountySummary | null>(null);
   const { accessToken: token } = useAuth();
   const [mockBounties, setMockBounties] = useState<bountySummary[]>([]);
+  const { Loader, loading, setLoading } = useLoader({
+    text: "Loading Bounties...",
+    variant: "full-screen",
+    color: "blue",
+  });
 
   const { data } = useGetOrgBounties(token ?? "");
 
   useEffect(() => {
     if (data) {
       setMockBounties(data);
+      setLoading(false);
     }
-  }, [data]);
+  }, [data, setLoading]);
+  if (loading) {
+    return <Loader />;
+  }
   return (
     <OrgLayout onCreateBounty={() => setCreateBountyOpen(true)}>
       <div className="space-y-8">

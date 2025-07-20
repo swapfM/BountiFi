@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { OrgLayout } from "@/components/org-layout";
+
 import {
   Select,
   SelectContent,
@@ -31,7 +31,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useGetTransactions } from "@/hooks/useGetTransactions";
 import { useAuth } from "@/context/AuthContext";
-import { useLoader } from "@/hooks/useLoader";
+import { HunterLayout } from "@/components/hunter-layout";
 
 interface Transaction {
   id: number;
@@ -83,10 +83,6 @@ export default function TransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const { data: transactions = [] } = useGetTransactions(accessToken ?? "");
-  const { Loader, loading, setLoading } = useLoader({
-    text: "Loading...",
-    variant: "full-screen",
-  });
   const filteredTransactions = transactions.filter(
     (transaction: Transaction) => {
       const matchesSearch =
@@ -109,21 +105,11 @@ export default function TransactionsPage() {
     navigator.clipboard.writeText(text);
   };
 
-  useEffect(() => {
-    if (transactions) {
-      setLoading(false);
-    }
-  }, [transactions, setLoading]);
-
-  if (loading) {
-    return <Loader />;
-  }
-
   return (
-    <OrgLayout>
+    <HunterLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-4xl font-bold text-neon-blue mb-2">
+          <h1 className="text-4xl font-bold text-neon-green mb-2">
             Transaction History
           </h1>
           <p className="text-muted-foreground">
@@ -220,7 +206,7 @@ export default function TransactionsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6 hover:bg-neon-blue/10"
+                          className="h-6 w-6 hover:bg-neon-green/10"
                           onClick={() =>
                             copyToClipboard(transaction.transactionHash)
                           }
@@ -232,7 +218,7 @@ export default function TransactionsPage() {
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className="capitalize bg-neon-blue/20 text-neon-blue border-neon-blue/30"
+                        className="capitalize bg-neon-green/20 text-neon-green border-neon-green/30"
                       >
                         {"BDAG"}
                       </Badge>
@@ -265,7 +251,7 @@ export default function TransactionsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 hover:bg-neon-blue/10"
+                          className="h-8 w-8 hover:bg-neon-green/10"
                           onClick={() =>
                             window.open(
                               getTestnetExplorerUrl(
@@ -295,6 +281,6 @@ export default function TransactionsPage() {
           </div>
         )}
       </div>
-    </OrgLayout>
+    </HunterLayout>
   );
 }

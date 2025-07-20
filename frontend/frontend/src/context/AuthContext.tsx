@@ -49,10 +49,10 @@ const safeLocalStorage = {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [isLoading, setIsLoading] = useState(true);
   const [name, setNameState] = useState<string | null>(null);
   const [accessToken, setAccessTokenState] = useState<string | null>(null);
   const [userType, setUserTypeState] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const { disconnect } = useDisconnect();
 
   useEffect(() => {
@@ -110,10 +110,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
+        isLoading,
         name,
         accessToken,
         userType,
-        isLoading,
         setName,
         setAccessToken,
         setUserType,

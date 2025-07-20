@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { DatePicker } from "@/components/ui/date-picker";
-import { useToast } from "@/components/ui/use-toast";
 import { useCreateOrgBounty } from "@/hooks/useCreateOrgBounty";
 import { useAuth } from "@/context/AuthContext";
 import { useFundBounty } from "@/hooks/contracts/useFundBounty";
@@ -126,6 +125,7 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
       );
     } finally {
       setLoading(false);
+      onClose();
     }
   };
 
