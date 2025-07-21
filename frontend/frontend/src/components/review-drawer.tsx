@@ -39,9 +39,10 @@ export function ReviewDrawer({
     setLoading(true);
     approve(
       submission.bountyId,
-      submission.bountyTitle,
       submission.payoutAmount,
-      submission.hunterId
+      submission.bountyTitle,
+      submission.hunterId,
+      accessToken ?? ""
     );
     approveSubmission({
       token: accessToken ?? "",

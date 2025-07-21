@@ -55,9 +55,6 @@ export function HunterSidebar({ collapsed, onToggle }: HunterSidebarProps) {
                   <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-neon-blue to-neon-green bg-clip-text text-transparent">
                     BountiFi
                   </span>
-                  <span className="text-xs text-muted-foreground font-mono tracking-wider">
-                    v2.0
-                  </span>
                 </div>
               </div>
             )}

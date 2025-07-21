@@ -21,6 +21,7 @@ export function useApproveSolution() {
         address: BOUNTY_ESCROW_CONTRACT_ADDRESS,
         abi: BOUNTY_ESCROW_ABI,
         functionName: "approveSolution",
+        //
         args: [bountyId],
         gas: BigInt(1_000_000),
       });
