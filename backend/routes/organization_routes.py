@@ -25,7 +25,7 @@ limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/create_bounty")
-@limiter.limit("5/minute")
+# @limiter.limit("5/minute")
 async def create_bounty_api(
     request: Request,
     bounty: BountyCreate,
@@ -54,7 +54,7 @@ async def create_bounty_api(
 
 
 @router.get("/bounties", response_model=list[BountySummary] | ErrorMessage)
-@limiter.limit("5/minute")
+# @limiter.limit("5/minute")
 async def get_bounties_by_organization_api(
     request: Request,
     current_user: User = Depends(get_current_user),
@@ -84,7 +84,7 @@ async def get_bounties_by_organization_api(
 @router.delete(
     "/delete_bounty/{bounty_id}", response_model=SuccessMessage | ErrorMessage
 )
-@limiter.limit("5/minute")
+# @limiter.limit("5/minute")
 async def delete_bounty_api(
     request: Request,
     bounty_id: int,
@@ -113,7 +113,7 @@ async def delete_bounty_api(
 
 
 @router.get("/bounty/{bounty_id}")
-@limiter.limit("5/minute")
+# @limiter.limit("5/minute")
 async def get_bounty_by_id_api(
     request: Request,
     bounty_id: int,
@@ -142,7 +142,7 @@ async def get_bounty_by_id_api(
 
 
 @router.put("/update_bounty/{bounty_id}", response_model=SuccessMessage | ErrorMessage)
-@limiter.limit("5/minute")
+# @limiter.limit("5/minute")
 async def update_bounty_api(
     request: Request,
     bounty_id: int,
@@ -174,7 +174,7 @@ async def update_bounty_api(
 @router.get(
     "/bounty_solution/{bounty_id}", response_model=BountySolutionResponse | ErrorMessage
 )
-@limiter.limit("5/minute")
+# @limiter.limit("5/minute")
 async def get_bounty_solutions_api(
     request: Request,
     bounty_id: int,
@@ -290,7 +290,7 @@ async def get_transactions_api(
     db: Session = Depends(get_db),
 ):
     try:
-        if current_user.user_type.value != "ORGANIZATION":
+        if current_user.user_type.value not in ["ORGANIZATION", "HUNTER"]:
             return JSONResponse(
                 status_code=403,
                 content={

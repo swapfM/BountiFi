@@ -18,7 +18,7 @@ limiter = Limiter(key_func=get_remote_address)
 
 
 @router.get("/open_bounties", response_model=list[BountySummary] | ErrorMessage)
-@limiter.limit("5/minute")
+# @limiter.limit("5/minute")
 async def get_open_bounties_api(
     request: Request,
     current_user: User = Depends(get_current_user),
@@ -44,7 +44,7 @@ async def get_open_bounties_api(
 
 
 @router.get("/bounty/{bounty_id}")
-@limiter.limit("5/minute")
+# @limiter.limit("5/minute")
 async def get_bounty_by_id_api(
     request: Request,
     bounty_id: int,
@@ -71,7 +71,7 @@ async def get_bounty_by_id_api(
 
 
 @router.get("/assign_bounty/{bounty_id}", response_model=SuccessMessage | ErrorMessage)
-@limiter.limit("5/minute")
+# @limiter.limit("5/minute")
 async def assign_bounty_api(
     request: Request,
     bounty_id: int,
@@ -102,7 +102,7 @@ async def assign_bounty_api(
 
 
 @router.get("/assigned_bounties", response_model=list[BountySummary] | ErrorMessage)
-@limiter.limit("5/minute")
+# @limiter.limit("5/minute")
 async def get_assigned_bounties_api(
     request: Request,
     current_user: User = Depends(get_current_user),
@@ -128,7 +128,7 @@ async def get_assigned_bounties_api(
 
 
 @router.post("/submit_solution", response_model=SuccessMessage | ErrorMessage)
-@limiter.limit("5/minute")
+# @limiter.limit("5/minute")
 async def submit_solution_api(
     request: Request,
     solution_data: CreateSolutionSchema,
@@ -150,6 +150,30 @@ async def submit_solution_api(
         )
     except Exception as e:
         logger.error(f"Error creating solution for bounty {bounty_id}: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
+        )
+
+
+@router.get("/solution_count")
+async def get_solution_count_api(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        if current_user.user_type.value != "HUNTER":
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Only hunters allowed",
+                },
+            )
+        hunter_api = HunterApi(db)
+        return await hunter_api.get_solution_count(current_user.id)
+    except Exception as e:
         return JSONResponse(
             status_code=500,
             content={"status": "error", "message": "Something went wrong"},

@@ -108,3 +108,17 @@ class HunterApi:
             self.db.rollback()
             logger.error(f"Error submitting solution: {str(e)}")
             return {"status": "error", "message": "Something went wrong"}
+
+    async def get_solution_count(self, hunter_id: int):
+        try:
+            count = (
+                self.db.query(BountySolution)
+                .filter(BountySolution.hunter_id == hunter_id)
+                .count()
+            )
+            return {"count": count}
+        except Exception as e:
+            logger.error(
+                f"Error fetching solutions count for hunter {hunter_id}: {str(e)}"
+            )
+            return {"status": "error", "message": "Something went wrong"}

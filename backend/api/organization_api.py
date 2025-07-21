@@ -121,7 +121,10 @@ class OrganizationAPI:
             pending_bounties = (
                 self.db.query(Bounty)
                 .options(joinedload(Bounty.solutions).joinedload(BountySolution.hunter))
-                .filter(Bounty.status == BountyStatus.IN_REVIEW)
+                .filter(
+                    Bounty.status == BountyStatus.IN_REVIEW
+                    or Bounty.status == BountyStatus.COMPLETED
+                )
                 .all()
             )
 
@@ -192,5 +195,17 @@ class OrganizationAPI:
 
             return {"status": "success", "transaction": new_transaction}
 
+        except Exception as e:
+            return {"status": "error", "message": f"Server error: {str(e)}"}
+
+    async def get_transactions(self, current_user: User):
+        try:
+            transactions = (
+                self.db.query(Transaction)
+                .filter(Transaction.user_id == current_user.id)
+                .order_by(Transaction.created_at.desc())
+                .all()
+            )
+            return transactions
         except Exception as e:
             return {"status": "error", "message": f"Server error: {str(e)}"}
