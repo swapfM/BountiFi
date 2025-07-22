@@ -116,7 +116,13 @@ export function BountyDetailsModal({
               )}
             </div>
 
-            <Badge className={cn("text-sm", statusColors[bounty.status])}>
+            <Badge
+              className={cn(
+                "text-sm",
+                statusColors[bounty.status as keyof typeof statusColors] ??
+                  "bg-gray-500/20 text-gray-400 border-gray-500/30"
+              )}
+            >
               {bounty.status.replace("-", " ").toUpperCase()}
             </Badge>
           </div>

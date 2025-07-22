@@ -28,10 +28,12 @@ export function useApproveSolution() {
 
       console.log("Submitted tx:", txHash);
 
+      if (!publicClient) {
+        throw new Error("Public client is not available.");
+      }
       const receipt = await publicClient.waitForTransactionReceipt({
         hash: txHash,
       });
-      console.log("Tx confirmed:", receipt);
 
       await axios.post(
         `${BASE_URL}/api/organization/create_transaction`,

@@ -27,12 +27,12 @@ export function useFundBounty() {
         gas: BigInt(1_000_000),
       });
 
-      console.log("Submitted tx:", txHash);
-
+      if (!publicClient) {
+        throw new Error("Public client is not available.");
+      }
       const receipt = await publicClient.waitForTransactionReceipt({
         hash: txHash,
       });
-      console.log("Tx confirmed:", receipt);
 
       await axios.post(
         `${BASE_URL}/api/organization/create_transaction`,
@@ -52,8 +52,6 @@ export function useFundBounty() {
 
       return receipt;
     } catch (err) {
-      console.error("Funding error:", err);
-
       if (txHash) {
         try {
           await axios.post(

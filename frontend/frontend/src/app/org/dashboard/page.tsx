@@ -8,6 +8,7 @@ import { EditBountyModal } from "@/components/edit-bounty-modal";
 import { useGetOrgBounties } from "@/hooks/useGetOrgBounties";
 import { useAuth } from "@/context/AuthContext";
 import { useLoader } from "@/hooks/useLoader";
+import type { BountyStatus } from "@/components/bounty-card";
 
 interface bountySummary {
   id: number;
@@ -16,7 +17,7 @@ interface bountySummary {
   techStack: string[];
   payoutAmount: number;
   payoutCurrency: string;
-  status: string;
+  status: BountyStatus;
   deadline: Date;
 }
 
@@ -78,11 +79,13 @@ export default function OrgDashboard() {
         isOpen={createBountyOpen}
         onClose={() => setCreateBountyOpen(false)}
       />
-      <EditBountyModal
-        bounty={editBounty}
-        isOpen={!!editBounty}
-        onClose={() => setEditBounty(null)}
-      />
+      {editBounty && (
+        <EditBountyModal
+          bounty={editBounty}
+          isOpen={true}
+          onClose={() => setEditBounty(null)}
+        />
+      )}
     </OrgLayout>
   );
 }
