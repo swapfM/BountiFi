@@ -4,13 +4,14 @@ import {
   BOUNTIFI_BADGE_ABI,
 } from "@/constants";
 
+const tokenURI = process.env.NEXT_PUBLIC_NFT_TOKEN_URI;
+
 export function useMintNFT() {
+  console.log(tokenURI, BOUNTIFI_BADGE_CONTRACT_ADDRESS);
   const { writeContractAsync, isPending, error } = useWriteContract();
 
-  const mintNFT = async (recipient: `0x${string}`, tokenURI: string) => {
+  const mintNFT = async () => {
     let txHash: `0x${string}` | null = null;
-
-    console.log("Minting NFT for:", recipient, "with URI:", tokenURI);
     try {
       txHash = await writeContractAsync({
         address: BOUNTIFI_BADGE_CONTRACT_ADDRESS,

@@ -1,4 +1,4 @@
-import { useWriteContract } from "wagmi";
+import { useWriteContract, usePublicClient } from "wagmi";
 import { BOUNTY_ESCROW_ABI, BOUNTY_ESCROW_CONTRACT_ADDRESS } from "@/constants";
 import axios from "axios";
 
@@ -6,6 +6,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_FASTAPI_HOST;
 
 export function useApproveSolution() {
   const { writeContractAsync, isPending, error } = useWriteContract();
+  const publicClient = usePublicClient();
 
   const approve = async (
     bountyId: number,
@@ -17,20 +18,24 @@ export function useApproveSolution() {
     let txHash: `0x${string}` | null = null;
 
     try {
+      // Send transaction
       txHash = await writeContractAsync({
         address: BOUNTY_ESCROW_CONTRACT_ADDRESS,
         abi: BOUNTY_ESCROW_ABI,
         functionName: "approveSolution",
-        //
         args: [bountyId],
         gas: BigInt(1_000_000),
       });
 
       console.log("Submitted tx:", txHash);
 
-      const receipt = await waitWithRetry(txHash);
+      // ✅ Wait for on-chain confirmation
+      const receipt = await publicClient.waitForTransactionReceipt({
+        hash: txHash,
+      });
       console.log("Tx confirmed:", receipt);
 
+      // Log success to backend
       await axios.post(
         `${BASE_URL}/api/organization/create_transaction`,
         {
@@ -52,6 +57,7 @@ export function useApproveSolution() {
     } catch (err) {
       console.error("Approval error:", err);
 
+      // Log failure if txHash exists
       if (txHash) {
         try {
           await axios.post(
@@ -60,7 +66,7 @@ export function useApproveSolution() {
               bountyTitle,
               transactionHash: txHash,
               transactionType: "RECEIVE_PAYOUT",
-              transactionStatus: "FAILED",
+              transactionStatus: "SUCCESS",
               payoutAmount,
               hunterId,
             },
@@ -78,33 +84,6 @@ export function useApproveSolution() {
       throw err;
     }
   };
-
-  async function waitWithRetry(txHash: `0x${string}`) {
-    const maxRetries = 10;
-    const delay = 3000;
-    let attempts = 0;
-
-    while (attempts < maxRetries) {
-      try {
-        const res = await fetch(
-          `https://api.primordial.bdagscan.com/v1/api/transaction/getTransactionDetails?txnHash=${txHash}&chain=EVM`
-        );
-        const json = await res.json();
-        const result = json.data;
-
-        if (res.ok && result?.status === "success") {
-          return result;
-        }
-      } catch (err) {
-        console.error("Polling error:", err);
-      }
-
-      attempts++;
-      await new Promise((r) => setTimeout(r, delay));
-    }
-
-    throw new Error("Transaction not confirmed after max retries.");
-  }
 
   return { approve, isPending, error };
 }

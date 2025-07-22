@@ -97,6 +97,7 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
 
     try {
       const data = await createBounty({ token, payload });
+      onClose();
 
       await fund(
         data.bounty.id,
@@ -125,7 +126,6 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
       );
     } finally {
       setLoading(false);
-      onClose();
     }
   };
 

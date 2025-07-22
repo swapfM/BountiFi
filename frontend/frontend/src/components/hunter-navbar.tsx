@@ -22,24 +22,7 @@ export function HunterNavbar() {
   };
 
   return (
-    <nav className="h-16 border-b border-border bg-card/30 backdrop-blur-sm flex items-center justify-between px-8 relative z-10">
-      <div className="flex items-center space-x-3">
-        <div className="relative">
-          <div className="w-8 h-8 rounded-md bg-gradient-to-br from-neon-green to-neon-blue flex items-center justify-center">
-            <Zap className="w-4 h-4 text-black" />
-          </div>
-          <div className="absolute -inset-1 bg-gradient-to-br from-neon-green to-neon-blue rounded-md opacity-20 blur-sm"></div>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-neon-green to-neon-blue bg-clip-text text-transparent">
-            BountiFi
-          </span>
-          <span className="text-xs text-muted-foreground font-mono tracking-wider">
-            v2.0
-          </span>
-        </div>
-      </div>
-
+    <nav className="h-16 border-b border-border bg-card/30 backdrop-blur-sm flex items-center justify-end px-8 relative z-10">
       <div className="flex items-center space-x-4">
         <w3m-button />
         <div className="flex items-center space-x-2 text-sm">

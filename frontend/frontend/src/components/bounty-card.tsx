@@ -49,7 +49,8 @@ export function BountyCard({
   const statusColors = {
     OPEN: "bg-neon-green/20 text-neon-green border-neon-green/30",
     ASSIGNED: "bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30",
-    completed: "bg-gray-500/20 text-gray-400 border-gray-500/30",
+    IN_REVIEW: "bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30",
+    COMPLETED: "bg-gray-500/20 text-gray-400 border-gray-500/30",
   };
 
   const accentColor = userType === "ORGANIZATION" ? "neon-blue" : "neon-green";
@@ -194,7 +195,6 @@ export function BountyCard({
                   </>
                 )}
 
-              {/* Show only Submit Solution for tasks that r assigned */}
               {userType == "HUNTER" && bounty.status === "ASSIGNED" && (
                 <Button
                   size="sm"

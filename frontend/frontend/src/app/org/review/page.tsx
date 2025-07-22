@@ -36,13 +36,25 @@ export default function ReviewSubmissions() {
   const [pendingBounties, setPendingBounties] = useState<PendingSubmission[]>(
     []
   );
+  const [reviewedSubmissions, setReviewedSubmissions] = useState<
+    PendingSubmission[]
+  >([]);
 
   const [selectedSubmission, setSelectedSubmission] =
     useState<PendingSubmission | null>(null);
 
   useEffect(() => {
     if (data) {
-      setPendingBounties(data);
+      setPendingBounties(
+        data.filter(
+          (bounty: PendingSubmission) => bounty.solutionStatus === "IN_REVIEW"
+        )
+      );
+      setReviewedSubmissions(
+        data.filter(
+          (bounty: PendingSubmission) => bounty.solutionStatus === "COMPLETED"
+        )
+      );
       setLoading(false);
     }
   }, [data, setLoading]);
@@ -148,6 +160,46 @@ export default function ReviewSubmissions() {
               All submissions have been reviewed. New submissions will appear
               here.
             </p>
+          </div>
+        )}
+
+        {/* Reviewed Submissions */}
+        {reviewedSubmissions.length > 0 && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold text-muted-foreground">
+              Recently Reviewed
+            </h2>
+
+            <div className="space-y-4">
+              {reviewedSubmissions.map((submission) => (
+                <Card
+                  key={submission.solutionId}
+                  className="p-6 bg-card/30 backdrop-blur-sm border-border/50"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-3">
+                        <h3 className="text-lg font-semibold text-muted-foreground">
+                          {submission.bountyTitle}
+                        </h3>
+                        <Badge className="bg-neon-green/20 text-neon-green border-neon-green/30">
+                          {submission.solutionStatus}
+                        </Badge>
+                      </div>
+
+                      <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                        <span>{submission.hunterName}</span>
+                        <span>
+                          {new Date(
+                            submission.submittedAt
+                          ).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
           </div>
         )}
       </div>

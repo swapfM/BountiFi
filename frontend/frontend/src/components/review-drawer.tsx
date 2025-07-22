@@ -103,42 +103,6 @@ export function ReviewDrawer({
         </SheetHeader>
 
         <div className="space-y-6">
-          {/* PR Preview */}
-          {/* <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">Pull Request</Label>
-              <a
-                href={submission.prUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-1 text-neon-blue hover:text-neon-blue/80 transition-colors text-sm"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span>View on GitHub</span>
-              </a>
-            </div>
-
-            <div className="bg-muted/20 rounded-lg p-4 border border-border">
-              <div className="text-sm text-muted-foreground mb-2">
-                PR Preview
-              </div>
-              <div className="bg-background/50 rounded p-3 font-mono text-sm">
-                <div className="text-neon-green">
-                  + Added comprehensive audit system
-                </div>
-                <div className="text-neon-green">
-                  + Implemented vulnerability detection
-                </div>
-                <div className="text-neon-green">
-                  + Added unit tests and documentation
-                </div>
-                <div className="text-red-400">
-                  - Removed deprecated functions
-                </div>
-              </div>
-            </div>
-          </div> */}
-
           {/* Submission Notes */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">Hunter&apos;s Notes</Label>

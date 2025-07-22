@@ -42,7 +42,7 @@ export function HunterSidebar({ collapsed, onToggle }: HunterSidebarProps) {
       >
         {/* Header */}
         <div className="p-4 border-b border-border">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-start">
             {!collapsed && (
               <div className="flex items-center space-x-3">
                 <div className="relative">
