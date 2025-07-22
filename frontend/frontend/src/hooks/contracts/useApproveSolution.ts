@@ -18,7 +18,6 @@ export function useApproveSolution() {
     let txHash: `0x${string}` | null = null;
 
     try {
-      // Send transaction
       txHash = await writeContractAsync({
         address: BOUNTY_ESCROW_CONTRACT_ADDRESS,
         abi: BOUNTY_ESCROW_ABI,
@@ -29,13 +28,11 @@ export function useApproveSolution() {
 
       console.log("Submitted tx:", txHash);
 
-      // ✅ Wait for on-chain confirmation
       const receipt = await publicClient.waitForTransactionReceipt({
         hash: txHash,
       });
       console.log("Tx confirmed:", receipt);
 
-      // Log success to backend
       await axios.post(
         `${BASE_URL}/api/organization/create_transaction`,
         {
@@ -57,7 +54,6 @@ export function useApproveSolution() {
     } catch (err) {
       console.error("Approval error:", err);
 
-      // Log failure if txHash exists
       if (txHash) {
         try {
           await axios.post(
