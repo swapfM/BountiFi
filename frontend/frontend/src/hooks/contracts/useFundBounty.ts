@@ -70,7 +70,7 @@ export function useFundBounty() {
             }
           );
         } catch (logErr) {
-          console.error("Failed to log failed txn to backend:", logErr);
+          throw logErr;
         }
       }
 

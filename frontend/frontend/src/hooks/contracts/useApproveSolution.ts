@@ -26,8 +26,6 @@ export function useApproveSolution() {
         gas: BigInt(1_000_000),
       });
 
-      console.log("Submitted tx:", txHash);
-
       if (!publicClient) {
         throw new Error("Public client is not available.");
       }
@@ -54,7 +52,7 @@ export function useApproveSolution() {
 
       return receipt;
     } catch (err) {
-      console.error("Approval error:", err);
+      throw error;
 
       if (txHash) {
         try {
@@ -75,7 +73,7 @@ export function useApproveSolution() {
             }
           );
         } catch (logErr) {
-          console.error("Failed to log failed txn to backend:", logErr);
+          throw logErr;
         }
       }
 

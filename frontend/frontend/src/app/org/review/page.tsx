@@ -163,7 +163,6 @@ export default function ReviewSubmissions() {
           </div>
         )}
 
-        {/* Reviewed Submissions */}
         {reviewedSubmissions.length > 0 && (
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold text-muted-foreground">

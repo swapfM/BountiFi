@@ -10,7 +10,7 @@ const fetchHunterSolutionCount = async (token: string) => {
       Authorization: `Bearer ${token}`,
     },
   });
-  console.log("Fetched solution count:", response.data);
+
   return camelcaseKeys(response.data, { deep: true });
 };
 

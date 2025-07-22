@@ -7,7 +7,6 @@ import {
 const tokenURI = process.env.NEXT_PUBLIC_NFT_TOKEN_URI;
 
 export function useMintNFT() {
-  console.log(tokenURI, BOUNTIFI_BADGE_CONTRACT_ADDRESS);
   const { writeContractAsync, isPending, error } = useWriteContract();
 
   const mintNFT = async () => {
@@ -21,10 +20,8 @@ export function useMintNFT() {
         gas: BigInt(1_000_000),
       });
 
-      console.log("Submitted tx:", txHash);
       return txHash;
     } catch (err) {
-      console.error("Minting error:", err);
       throw err;
     }
   };

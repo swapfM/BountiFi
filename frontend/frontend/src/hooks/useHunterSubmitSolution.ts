@@ -10,7 +10,6 @@ interface SolutionPayload {
 }
 
 const postSubmitSolution = async (token: string, payload: SolutionPayload) => {
-  console.log(payload);
   const response = await axios.post(
     `${BASE_URL}/api/hunter/submit_solution`,
     payload,

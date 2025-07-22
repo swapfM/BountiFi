@@ -67,7 +67,7 @@ export default function HunterDashboard() {
           }
         },
         onError: (error) => {
-          console.log(error);
+          throw error;
         },
       }
     );

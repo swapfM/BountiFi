@@ -40,10 +40,9 @@ export default function RewardsPage() {
   const handleMintNFT = async (rewardId: string) => {
     setMinting(rewardId);
     try {
-      // Simulate minting process
       mintNFT();
     } catch (error) {
-      console.error("Minting failed:", error);
+      throw error;
     } finally {
       setMinting(null);
     }
@@ -128,7 +127,6 @@ export default function RewardsPage() {
               </Badge>
             </div>
 
-            {/* Rewards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {availableRewards.map((reward) => {
                 const canMint = canMintReward(reward.requiredSolutions);
@@ -228,7 +226,6 @@ export default function RewardsPage() {
             </div>
           </div>
 
-          {/* Empty State */}
           {approvedSolutionsCount === 0 && !loading && (
             <div className="text-center py-12">
               <div className="w-16 h-16 rounded-full bg-muted/20 flex items-center justify-center mx-auto mb-4">

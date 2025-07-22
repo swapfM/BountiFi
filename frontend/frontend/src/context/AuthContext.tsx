@@ -28,7 +28,7 @@ const safeLocalStorage = {
     try {
       return localStorage.getItem(key);
     } catch (error) {
-      console.warn(`Failed to get ${key} from localStorage:`, error);
+      throw error;
       return null;
     }
   },
@@ -36,14 +36,14 @@ const safeLocalStorage = {
     try {
       localStorage.setItem(key, value);
     } catch (error) {
-      console.warn(`Failed to set ${key} in localStorage:`, error);
+      throw error;
     }
   },
   removeItem: (key: string): void => {
     try {
       localStorage.removeItem(key);
     } catch (error) {
-      console.warn(`Failed to remove ${key} from localStorage:`, error);
+      throw error;
     }
   },
 };
