@@ -8,7 +8,7 @@ import { EditBountyModal } from "@/components/edit-bounty-modal";
 import { useGetOrgBounties } from "@/hooks/useGetOrgBounties";
 import { useAuth } from "@/context/AuthContext";
 import { useLoader } from "@/hooks/useLoader";
-import type { BountyStatus } from "@/components/bounty-card";
+import { BountyStatus } from "@/types/AuthTypes";
 
 interface bountySummary {
   id: number;

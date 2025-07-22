@@ -9,8 +9,7 @@ import { useHunterAssignBounty } from "@/hooks/useHunterAssignBounty";
 import { useAuth } from "@/context/AuthContext";
 import { useGetHunterAssignedBounties } from "@/hooks/useGetHunterAssignedBounties";
 import { useAssignHunter } from "@/hooks/contracts/useAssignHunter";
-
-import type { BountyStatus } from "@/components/bounty-card";
+import { BountyStatus } from "@/types/AuthTypes";
 
 interface bountySummary {
   id: number;

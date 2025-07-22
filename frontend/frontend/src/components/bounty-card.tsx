@@ -10,8 +10,7 @@ import { Calendar, Edit, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
-
-type BountyStatus = "OPEN" | "ASSIGNED" | "IN_REVIEW" | "COMPLETED";
+import { BountyStatus } from "@/types/AuthTypes";
 
 interface BountyCardProps {
   bounty: {
