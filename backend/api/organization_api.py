@@ -122,8 +122,7 @@ class OrganizationAPI:
                 self.db.query(Bounty)
                 .options(joinedload(Bounty.solutions).joinedload(BountySolution.hunter))
                 .filter(
-                    Bounty.status == BountyStatus.IN_REVIEW
-                    or Bounty.status == BountyStatus.COMPLETED
+                    Bounty.status.in_([BountyStatus.IN_REVIEW, BountyStatus.COMPLETED])
                 )
                 .all()
             )
