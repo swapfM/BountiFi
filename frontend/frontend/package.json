@@ -43,7 +43,8 @@
     "wagmi": "^2.12.25"
   },
   "overrides": {
-    "@walletconnect/core": "2.19.1"
+    "@walletconnect/core": "2.19.1",
+    "@coinbase/wallet-sdk": "4.3.4"
   },
   "devDependencies": {
     "@types/node": "^20",
