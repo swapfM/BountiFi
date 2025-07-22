@@ -214,19 +214,22 @@ export function BountyCard({
           </div>
         </CardContent>
       </Card>
-
-      <SubmissionModal
-        bounty={bounty}
-        isOpen={submissionOpen}
-        onClose={() => setSubmissionOpen(false)}
-      />
-      <BountyDetailsModal
-        bountyId={bounty.id}
-        isOpen={detailsOpen}
-        onClose={() => setDetailsOpen(false)}
-        onClaim={onClaim}
-        userType={userType}
-      />
+      {submissionOpen && (
+        <SubmissionModal
+          bounty={bounty}
+          isOpen={submissionOpen}
+          onClose={() => setSubmissionOpen(false)}
+        />
+      )}
+      {detailsOpen && (
+        <BountyDetailsModal
+          bountyId={bounty.id}
+          isOpen={detailsOpen}
+          onClose={() => setDetailsOpen(false)}
+          onClaim={onClaim}
+          userType={userType}
+        />
+      )}
     </>
   );
 }

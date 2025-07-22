@@ -3,6 +3,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -57,6 +58,7 @@ export function BountyDetailsModal({
   onClaim,
   userType,
 }: BountyDetailsModalProps) {
+  console.log(bountyId);
   const [bounty, setBounty] = useState<BountyDetails | null>(null);
   const { accessToken, userType: authUserType } = useAuth();
 
@@ -103,6 +105,10 @@ export function BountyDetailsModal({
                   </Badge>
                 )}
               </div>
+              <DialogDescription>
+                View full details for the bounty, including organization,
+                status, and more.
+              </DialogDescription>
 
               {bounty.orgName && (
                 <div className="flex items-center space-x-3">
