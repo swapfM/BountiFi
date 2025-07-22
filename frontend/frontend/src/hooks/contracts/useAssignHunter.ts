@@ -1,6 +1,5 @@
 import { useWriteContract } from "wagmi";
 import { BOUNTY_ESCROW_ABI, BOUNTY_ESCROW_CONTRACT_ADDRESS } from "@/constants";
-import { parseEther } from "viem";
 
 export function useAssignHunter() {
   const { writeContract, isPending, error, data } = useWriteContract();
@@ -14,7 +13,7 @@ export function useAssignHunter() {
       address: BOUNTY_ESCROW_CONTRACT_ADDRESS,
       abi: BOUNTY_ESCROW_ABI,
       functionName: "assignHunter",
-      //value: parseEther("2"),
+
       args: [bountyId],
       gas: BigInt(1000000),
     });

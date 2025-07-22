@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { HunterLayout } from "@/components/hunter-layout";
 import { BountyCard } from "@/components/bounty-card";
-import { FilterBar } from "@/components/filter-bar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetOpenBounties } from "@/hooks/useGetOpenBounties";
 import { useHunterAssignBounty } from "@/hooks/useHunterAssignBounty";

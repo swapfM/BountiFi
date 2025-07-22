@@ -25,6 +25,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { useCreateOrgBounty } from "@/hooks/useCreateOrgBounty";
 import { useAuth } from "@/context/AuthContext";
 import { useFundBounty } from "@/hooks/contracts/useFundBounty";
+import { AxiosError } from "axios";
 
 interface CreateBountyModalProps {
   isOpen: boolean;
@@ -119,10 +120,11 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
       });
 
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError;
       console.error(
         "Bounty creation or funding failed:",
-        error?.response?.data || error?.message || error
+        axiosError?.response?.data || axiosError?.message || error
       );
     } finally {
       setLoading(false);

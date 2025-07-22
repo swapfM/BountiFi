@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 
+type BountyStatus = "OPEN" | "ASSIGNED" | "IN_REVIEW" | "COMPLETED";
+
 interface BountyCardProps {
   bounty: {
     id: number;
@@ -19,7 +21,7 @@ interface BountyCardProps {
     techStack: string[];
     payoutAmount: number;
     payoutCurrency: string;
-    status: string;
+    status: BountyStatus;
     deadline: Date;
     orgName?: string;
     orgLogo?: string;

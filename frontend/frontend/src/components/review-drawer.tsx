@@ -17,8 +17,22 @@ import { useAuth } from "@/context/AuthContext";
 import { useOrgApproveSubmission } from "@/hooks/useOrgApproveSubmission";
 import { useApproveSolution } from "@/hooks/contracts/useApproveSolution";
 
+interface Submission {
+  bountyId: number;
+  hunterId: number;
+  bountyTitle: string;
+  payoutAmount: number;
+  bountyDescription: string;
+  solutionDescription: string;
+  solutionLink: string;
+  solutionId: number;
+  hunterName: string;
+  submittedAt: Date;
+  solutionStatus: string;
+}
+
 interface ReviewDrawerProps {
-  submission: any;
+  submission: Submission | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -36,6 +50,7 @@ export function ReviewDrawer({
   const { approve } = useApproveSolution();
 
   const handleApprove = async () => {
+    if (!submission) return;
     setLoading(true);
     approve(
       submission.bountyId,

@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   Calendar,
-  DollarSign,
   ExternalLink,
   Github,
   Globe,
@@ -269,7 +268,7 @@ export function BountyDetailsModal({
               Close
             </Button>
 
-            {userType === "hunter" && bounty.status === "open" && onClaim && (
+            {userType === "HUNTER" && bounty.status === "open" && onClaim && (
               <Button
                 onClick={handleClaimBounty}
                 className="bg-neon-green hover:bg-neon-green/80 text-black font-semibold neon-glow-green px-8"

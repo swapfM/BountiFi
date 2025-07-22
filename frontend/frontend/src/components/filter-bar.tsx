@@ -15,7 +15,7 @@ interface FilterBarProps {
     maxReward: number;
     newOnly: boolean;
   };
-  onFiltersChange: (filters: any) => void;
+  onFiltersChange: (filters: unknown) => void;
 }
 
 const techOptions = [
