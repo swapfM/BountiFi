@@ -40,6 +40,7 @@ class BountyStatus(enum.Enum):
     ASSIGNED = "ASSIGNED"
     IN_REVIEW = "IN_REVIEW"
     COMPLETED = "COMPLETED"
+    EXPIRED = "EXPIRED"
 
 
 class BountySolutionStatus(enum.Enum):
@@ -97,6 +98,7 @@ class Bounty(Base):
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     assigned_to = Column(Integer, ForeignKey("users.id"), nullable=True)
+    refund = Column(Boolean, default=False)
 
     organization = relationship(
         "User", foreign_keys=[organization_id], back_populates="created_bounties"

@@ -6,6 +6,7 @@ from schema.organization_schema import (
     TransactionCreateSchema,
     TransactionTypeEnum,
 )
+from datetime import datetime
 from fastapi import HTTPException, status
 from db.models import (
     User,
@@ -43,7 +44,22 @@ class OrganizationAPI:
                 .filter(Bounty.organization_id == organization_id)
                 .all()
             )
+
+            now = datetime.utcnow()
+            expired_bounties = []
+
+            for bounty in bounties:
+                if bounty.deadline < now and bounty.status not in [
+                    BountyStatus.EXPIRED,
+                    BountyStatus.COMPLETED,
+                ]:
+                    bounty.status = BountyStatus.EXPIRED
+                    expired_bounties.append(bounty)
+
+            self.db.commit()
+
             return bounties
+
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
@@ -207,4 +223,25 @@ class OrganizationAPI:
             )
             return transactions
         except Exception as e:
+            return {"status": "error", "message": f"Server error: {str(e)}"}
+
+    async def mark_refunded(self, bounty_id):
+        try:
+            bounty = self.db.query(Bounty).filter(Bounty.id == bounty_id).first()
+
+            if not bounty:
+                return {"status": "error", "message": "Bounty not found"}
+
+            if bounty.refund:
+                return {
+                    "status": "error",
+                    "message": "Bounty already marked as refunded",
+                }
+
+            bounty.refund = True
+            self.db.commit()
+
+            return {"status": "success", "message": "Bounty marked as refunded"}
+        except Exception as e:
+            self.db.rollback()
             return {"status": "error", "message": f"Server error: {str(e)}"}

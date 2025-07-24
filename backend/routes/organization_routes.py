@@ -307,3 +307,30 @@ async def get_transactions_api(
             status_code=500,
             content={"status": "error", "message": "Something went wrong"},
         )
+
+
+@router.post("/bounty/mark_refunded/{bounty_id}")
+async def mark_refunded_api(
+    request: Request,
+    bounty_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        if current_user.user_type.value != "ORGANIZATION":
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Not Allowed",
+                },
+            )
+        organization_api = OrganizationAPI(db)
+        return await organization_api.mark_refunded(bounty_id=bounty_id)
+
+    except Exception as e:
+        logger.error(f"Error marking as refunded {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
+        )
