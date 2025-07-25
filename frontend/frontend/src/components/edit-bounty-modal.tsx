@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { DatePicker } from "@/components/ui/date-picker";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 interface BountyDetails {
   id: number;
@@ -82,7 +82,6 @@ export function EditBountyModal({
     githubIssueLink: "",
   });
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     if (bounty) {
@@ -106,10 +105,8 @@ export function EditBountyModal({
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    toast({
-      title: "Bounty Updated Successfully",
+    toast("Bounty Updated Successfully", {
       description: "Your bounty has been updated with the new information.",
-      variant: "success",
     });
 
     setLoading(false);

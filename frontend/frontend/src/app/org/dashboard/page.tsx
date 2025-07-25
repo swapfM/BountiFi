@@ -9,6 +9,7 @@ import { useGetOrgBounties } from "@/hooks/useGetOrgBounties";
 import { useAuth } from "@/context/AuthContext";
 import { useLoader } from "@/hooks/useLoader";
 import { BountyStatus } from "@/types/AuthTypes";
+import { useMarkRefund } from "@/hooks/useMarkRefund";
 
 interface bountySummary {
   id: number;
@@ -19,6 +20,7 @@ interface bountySummary {
   payoutCurrency: string;
   status: BountyStatus;
   deadline: Date;
+  refund?: boolean;
 }
 
 export default function OrgDashboard() {
@@ -31,6 +33,7 @@ export default function OrgDashboard() {
     variant: "full-screen",
     color: "blue",
   });
+  const { mutate } = useMarkRefund();
 
   const { data } = useGetOrgBounties(token ?? "");
 
@@ -43,6 +46,11 @@ export default function OrgDashboard() {
   if (loading) {
     return <Loader />;
   }
+
+  const handleRefundBounty = (bounty_id: number) => {
+    mutate({ token: token ?? "", bounty_id: bounty_id });
+  };
+
   return (
     <OrgLayout onCreateBounty={() => setCreateBountyOpen(true)}>
       <div className="space-y-8">
@@ -70,6 +78,7 @@ export default function OrgDashboard() {
               bounty={bounty}
               userType="ORGANIZATION"
               onEdit={() => setEditBounty(bounty)}
+              onRefund={() => handleRefundBounty(bounty.id)}
             />
           ))}
         </div>

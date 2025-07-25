@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SubmissionModal } from "@/components/submission-modal";
 import { BountyDetailsModal } from "@/components/bounty-details-modal";
-import { Calendar, Edit, Eye } from "lucide-react";
+import { Calendar, Edit, Eye, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { format } from "date-fns";
-import { BountyStatus } from "@/types/AuthTypes";
+import type { BountyStatus } from "@/types/AuthTypes";
 
 interface BountyCardProps {
   bounty: {
@@ -22,10 +22,10 @@ interface BountyCardProps {
     payoutCurrency: string;
     status: BountyStatus;
     deadline: Date;
+    refund?: boolean;
     orgName?: string;
     orgLogo?: string;
     isNew?: boolean;
-
     codebaseUrl?: string;
     externalWebsite?: string;
     githubIssueLink?: string;
@@ -34,6 +34,7 @@ interface BountyCardProps {
   showSubmit?: boolean;
   onEdit?: () => void;
   onClaim?: () => void;
+  onRefund?: () => void;
 }
 
 export function BountyCard({
@@ -42,16 +43,17 @@ export function BountyCard({
   showSubmit,
   onEdit,
   onClaim,
+  onRefund,
 }: BountyCardProps) {
   const [submissionOpen, setSubmissionOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const { toast } = useToast();
 
   const statusColors = {
     OPEN: "bg-neon-green/20 text-neon-green border-neon-green/30",
     ASSIGNED: "bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30",
     IN_REVIEW: "bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30",
     COMPLETED: "bg-gray-500/20 text-gray-400 border-gray-500/30",
+    EXPIRED: "bg-red-500/20 text-red-400 border-red-500/30",
   };
 
   const accentColor = userType === "ORGANIZATION" ? "neon-blue" : "neon-green";
@@ -59,17 +61,24 @@ export function BountyCard({
     userType === "ORGANIZATION" ? "neon-glow" : "neon-glow-green";
 
   function formatDeadline(date: Date | string) {
-    //  “dd/MM/yyyy” date format for now
+    // "dd/MM/yyyy" date format for now
     return format(date, "dd/MM/yyyy");
   }
 
   const handleAssignBounty = () => {
     if (onClaim) {
       onClaim();
-      toast({
-        title: "Bounty Claimed Successfully! ",
+      toast("Bounty Claimed Successfully! ", {
         description: `You've claimed "${bounty.title}". Check your My Tasks tab to start working on it.`,
-        variant: "success",
+      });
+    }
+  };
+
+  const handleRefund = () => {
+    if (onRefund) {
+      onRefund();
+      toast.info("Refund Requested", {
+        description: `Refund for "${bounty.title}" submitted. You'll receive ${bounty.payoutCurrency} ${bounty.payoutAmount}`,
       });
     }
   };
@@ -82,7 +91,8 @@ export function BountyCard({
           `hover:border-${accentColor}`,
           bounty.isNew &&
             userType === "HUNTER" &&
-            "ring-1 ring-neon-green/30 neon-glow-green"
+            "ring-1 ring-neon-green/30 neon-glow-green",
+          bounty.status === "EXPIRED" && "opacity-75"
         )}
       >
         <CardHeader className="pb-3">
@@ -106,19 +116,20 @@ export function BountyCard({
                   <Eye className="h-4 w-4" />
                 </Button>
               }
-              {userType === "ORGANIZATION" && onEdit && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onEdit}
-                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-              )}
+              {userType === "ORGANIZATION" &&
+                bounty.status !== "EXPIRED" &&
+                onEdit && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onEdit}
+                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                )}
             </div>
           </div>
-
           {bounty.orgName && (
             <div className="flex items-center text-sm text-muted-foreground">
               <div className="w-6 h-6 rounded-full bg-neon-blue/20 flex items-center justify-center text-xs font-semibold text-neon-blue mr-2">
@@ -166,9 +177,8 @@ export function BountyCard({
 
           <div className="flex items-center justify-between">
             <Badge className={cn("text-xs", statusColors[bounty.status])}>
-              {bounty.status.replace("-", " ").toUpperCase()}
+              {bounty.status.replace("_", " ").toUpperCase()}
             </Badge>
-
             <div className="flex space-x-2">
               {/* Show View Details only for hunters viewing available bounties (not in My Tasks) */}
               {userType === "HUNTER" &&
@@ -209,11 +219,27 @@ export function BountyCard({
                 </Button>
               )}
 
-              {/* For org cards, no action buttons in the bottom area */}
+              {userType === "ORGANIZATION" && bounty.status === "EXPIRED" && (
+                <Button
+                  size="sm"
+                  onClick={!bounty.refund ? handleRefund : undefined}
+                  disabled={!!bounty.refund}
+                  variant="outline"
+                  className={`${
+                    bounty.refund
+                      ? "border-green-500/30 text-green-500 bg-green-500/10 cursor-default"
+                      : "border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 bg-transparent"
+                  }`}
+                >
+                  <RefreshCw className="w-4 h-4 mr-1" />
+                  {bounty.refund ? "Refunded" : "Get Refund"}
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
+
       {submissionOpen && (
         <SubmissionModal
           bounty={bounty}
@@ -221,6 +247,7 @@ export function BountyCard({
           onClose={() => setSubmissionOpen(false)}
         />
       )}
+
       {detailsOpen && (
         <BountyDetailsModal
           bountyId={bounty.id}

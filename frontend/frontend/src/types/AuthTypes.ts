@@ -10,4 +10,9 @@ export type SignupPayload = {
   user_type: "HUNTER" | "ORGANIZATION";
 };
 
-export type BountyStatus = "OPEN" | "ASSIGNED" | "IN_REVIEW" | "COMPLETED";
+export type BountyStatus =
+  | "OPEN"
+  | "ASSIGNED"
+  | "IN_REVIEW"
+  | "COMPLETED"
+  | "EXPIRED";
