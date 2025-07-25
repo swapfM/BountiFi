@@ -309,7 +309,7 @@ async def get_transactions_api(
         )
 
 
-@router.post("/bounty/mark_refunded/{bounty_id}")
+@router.post("/mark_refunded/{bounty_id}")
 async def mark_refunded_api(
     request: Request,
     bounty_id: int,

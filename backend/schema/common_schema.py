@@ -12,6 +12,7 @@ class BountySummary(BaseModel):
     deadline: datetime | None = None
     tech_stack: list[str]
     status: str
+    refund: bool
 
     class Config:
         from_attributes = True
