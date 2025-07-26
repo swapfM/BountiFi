@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
 from api.organization_api import OrganizationAPI
-from schema.organization_schema import BountyCreate, TransactionCreateSchema
+from schema.organization_schema import BountyCreate, FundBountySchema
 from schema.common_schema import (
     BountyGet,
     BountySummary,
@@ -227,10 +227,11 @@ async def get_pending_submissions_api(
         )
 
 
-@router.get("/approve_submission/{submission_id}")
+@router.post("/approve_submission/{submission_id}")
 async def get_approve_submissions_api(
     request: Request,
     submission_id: int,
+    data: FundBountySchema,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -245,38 +246,14 @@ async def get_approve_submissions_api(
             )
 
         organization_api = OrganizationAPI(db)
-        return await organization_api.approve_submission(submission_id=submission_id)
+        return await organization_api.approve_submission(
+            submission_id=submission_id,
+            transaction_hash=data.transaction_hash,
+            bounty_id=data.bounty_id,
+        )
 
     except Exception as e:
         logger.error(f"Error approving submissions {str(e)}")
-        return JSONResponse(
-            status_code=500,
-            content={"status": "error", "message": "Something went wrong"},
-        )
-
-
-@router.post("/create_transaction")
-async def create_transaction_api(
-    request: Request,
-    transaction_data: TransactionCreateSchema,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    try:
-        if current_user.user_type.value != "ORGANIZATION":
-            return JSONResponse(
-                status_code=403,
-                content={
-                    "status": "error",
-                    "message": "Not Allowed",
-                },
-            )
-        organization_api = OrganizationAPI(db)
-        return await organization_api.create_transaction(
-            transaction_data, current_user=current_user
-        )
-    except Exception as e:
-        logger.error(f"Error creating transaction {str(e)}")
         return JSONResponse(
             status_code=500,
             content={"status": "error", "message": "Something went wrong"},
@@ -328,6 +305,37 @@ async def mark_refunded_api(
         organization_api = OrganizationAPI(db)
         return await organization_api.mark_refunded(bounty_id=bounty_id)
 
+    except Exception as e:
+        logger.error(f"Error marking as refunded {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
+        )
+
+
+@router.post("/fund_bounty")
+async def fund_bounty_api(
+    request: Request,
+    data: FundBountySchema,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        if current_user.user_type.value != "ORGANIZATION":
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Not Allowed",
+                },
+            )
+        organization_api = OrganizationAPI(db)
+
+        return await organization_api.fund_bounty(
+            transaction_hash=data.transaction_hash,
+            bounty_id=data.bounty_id,
+            current_user=current_user,
+        )
     except Exception as e:
         logger.error(f"Error marking as refunded {str(e)}")
         return JSONResponse(

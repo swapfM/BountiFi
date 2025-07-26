@@ -3,8 +3,6 @@ from sqlalchemy.orm import Session, joinedload
 from schema.common_schema import BountySummary
 from schema.organization_schema import (
     BountyCreate,
-    TransactionCreateSchema,
-    TransactionTypeEnum,
 )
 from datetime import datetime
 from fastapi import HTTPException, status
@@ -15,7 +13,10 @@ from db.models import (
     BountySolution,
     BountySolutionStatus,
     Transaction,
+    TransactionStatus,
+    TransactionType,
 )
+from utils.transaction_status import poll_transaction_status
 
 
 class OrganizationAPI:
@@ -167,42 +168,75 @@ class OrganizationAPI:
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
-    async def approve_submission(self, submission_id: int):
+    async def approve_submission(
+        self, submission_id: int, transaction_hash: str, bounty_id: int
+    ):
         try:
+
             submission = (
                 self.db.query(BountySolution)
                 .filter(BountySolution.id == submission_id)
                 .first()
             )
+
+            if not submission:
+                return {"status": "error", "message": "submission not found"}
+            elif submission.status == BountySolutionStatus.ACCEPTED:
+                return {"status": "error", "message": "Already approved"}
             bounty = submission.bounty
-            submission.status = BountySolutionStatus.ACCEPTED
-            bounty.status = BountyStatus.COMPLETED
-            self.db.commit()
-            self.db.refresh(bounty)
-            self.db.refresh(submission)
-            return {
-                "status": "success",
-                "bounty_id": bounty.id,
-                "new_status": bounty.status.value,
+            if not bounty:
+                return {"status": "error", "message": "bounty not found"}
+            elif bounty.status != BountyStatus.IN_REVIEW:
+                return {"status": "error", "message": "bounty must be under review"}
+
+            transaction_data = {
+                "bounty_title": bounty.title,
+                "transaction_hash": transaction_hash,
+                "transaction_type": TransactionType.RECEIVE_PAYOUT,
+                "transaction_status": TransactionStatus.PENDING,
+                "amount": bounty.payout_amount,
+                "user_id": bounty.assigned_to,
             }
-        except Exception as e:
-            return {"status": "error", "message": f"Server error: {str(e)}"}
 
-    async def create_transaction(
-        self, transaction_data: TransactionCreateSchema, current_user: User
-    ):
-        try:
-            data = transaction_data.dict()
+            await self.create_transaction(transaction_data=transaction_data)
+            status = await poll_transaction_status(transaction_hash)
 
-            user_id = (
-                data["user_id"]
-                if data["transaction_type"] == TransactionTypeEnum.RECEIVE_PAYOUT
-                and data.get("user_id") is not None
-                else current_user.id
+            transaction = (
+                self.db.query(Transaction)
+                .filter(Transaction.transaction_hash == transaction_hash)
+                .first()
             )
 
-            data.pop("user_id", None)
-            new_transaction = Transaction(**data, user_id=user_id)
+            if not transaction:
+                return {
+                    "status": "error",
+                    "message": "Transaction record not found after creation",
+                }
+
+            if status == "success":
+                submission.status = BountySolutionStatus.ACCEPTED
+                bounty.status = BountyStatus.COMPLETED
+                transaction.transaction_status = TransactionStatus.SUCCESS
+                self.db.commit()
+                return {
+                    "status": "success",
+                    "message": "Successfully paid to hunter",
+                }
+            else:
+                transaction.transaction_status = TransactionStatus.FAILED
+                self.db.commit()
+                return {
+                    "status": "error",
+                    "message": "Failed to approve solution",
+                }
+        except Exception as e:
+            self.db.rollback()
+            return {"status": "error", "message": f"Server error: {str(e)}"}
+
+    async def create_transaction(self, transaction_data):
+        try:
+
+            new_transaction = Transaction(**transaction_data)
 
             self.db.add(new_transaction)
             self.db.commit()
@@ -242,6 +276,58 @@ class OrganizationAPI:
             self.db.commit()
 
             return {"status": "success", "message": "Bounty marked as refunded"}
+        except Exception as e:
+            self.db.rollback()
+            return {"status": "error", "message": f"Server error: {str(e)}"}
+
+    async def fund_bounty(
+        self, transaction_hash: str, bounty_id: int, current_user: User
+    ):
+        try:
+            bounty = self.db.query(Bounty).filter(Bounty.id == bounty_id).first()
+            if not bounty:
+                return {"status": "error", "message": "bounty not found"}
+            elif bounty.status != BountyStatus.UNFUNDED:
+                return {"status": "error", "message": "bounty not unfunded"}
+
+            transaction_data = {
+                "bounty_title": bounty.title,
+                "transaction_hash": transaction_hash,
+                "transaction_type": TransactionType.FUND_BOUNTY,
+                "transaction_status": TransactionStatus.PENDING,
+                "amount": bounty.payout_amount,
+                "user_id": current_user.id,
+            }
+
+            await self.create_transaction(transaction_data=transaction_data)
+
+            status = await poll_transaction_status(transaction_hash)
+
+            transaction = (
+                self.db.query(Transaction)
+                .filter(Transaction.transaction_hash == transaction_hash)
+                .first()
+            )
+
+            if not transaction:
+                return {
+                    "status": "error",
+                    "message": "Transaction record not found after creation",
+                }
+
+            if status == "success":
+                bounty.status = BountyStatus.OPEN
+                transaction.transaction_status = TransactionStatus.SUCCESS
+                self.db.commit()
+                return {
+                    "status": "success",
+                    "message": "bounty funded successfully",
+                }
+            else:
+                transaction.transaction_status = TransactionStatus.FAILED
+                self.db.commit()
+                return {"status": "error", "message": "transaction failed"}
+
         except Exception as e:
             self.db.rollback()
             return {"status": "error", "message": f"Server error: {str(e)}"}

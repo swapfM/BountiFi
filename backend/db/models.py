@@ -36,6 +36,7 @@ class TransactionStatus(enum.Enum):
 
 
 class BountyStatus(enum.Enum):
+    UNFUNDED = "UNFUNDED"
     OPEN = "OPEN"
     ASSIGNED = "ASSIGNED"
     IN_REVIEW = "IN_REVIEW"
@@ -91,7 +92,7 @@ class Bounty(Base):
     github_issue_link = Column(String(255), nullable=True)
     payout_currency = Column(String(255), nullable=False)
     payout_amount = Column(Numeric(10, 2), nullable=False)
-    status = Column(Enum(BountyStatus), default=BountyStatus.OPEN, nullable=False)
+    status = Column(Enum(BountyStatus), default=BountyStatus.UNFUNDED, nullable=False)
     organization_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     deadline = Column(DateTime, nullable=False)
     tech_stack = Column(JSON, nullable=True)
@@ -107,12 +108,6 @@ class Bounty(Base):
         "User", foreign_keys=[assigned_to], back_populates="assigned_bounties"
     )
     solutions = relationship("BountySolution", back_populates="bounty")
-
-    def __repr__(self):
-        return (
-            f"<Bounty(id={self.id}, title={self.title}, "
-            f"reward={self.reward}, status={self.status})>"
-        )
 
 
 class BountySolution(Base):
