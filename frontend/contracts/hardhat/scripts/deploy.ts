@@ -15,14 +15,14 @@ async function main() {
   const balance = await ethers.provider.getBalance(deployer.address);
   console.log("Account balance:", ethers.formatEther(balance), "BDAG");
 
-  // const Escrow = await ethers.getContractFactory("BountyEscrow");
+  const Escrow = await ethers.getContractFactory("BountyEscrow");
 
-  // const escrow = await Escrow.deploy(platformAddress as string);
+  const escrow = await Escrow.deploy(platformAddress as string);
 
-  // await escrow.waitForDeployment();
+  await escrow.waitForDeployment();
 
-  // const address1 = await escrow.getAddress();
-  // console.log("Escrow deployed to:", address1);
+  const address1 = await escrow.getAddress();
+  console.log("Escrow deployed to:", address1);
 
   const NFT = await ethers.getContractFactory("BountiFiBadge");
 
