@@ -33,7 +33,7 @@ async def poll_transaction_status(
                 return "success"
             elif receipt and receipt["status"] == 0:
                 logger.warning(f" Transaction {tx_hash} failed.")
-                return "fail"
+                return "failed"
         except Exception as e:
             logger.info(f" Waiting for tx {tx_hash}...")
 

@@ -53,6 +53,7 @@ class OrganizationAPI:
                 if bounty.deadline < now and bounty.status not in [
                     BountyStatus.EXPIRED,
                     BountyStatus.COMPLETED,
+                    BountyStatus.UNFUNDED,
                 ]:
                     bounty.status = BountyStatus.EXPIRED
                     expired_bounties.append(bounty)
@@ -259,7 +260,9 @@ class OrganizationAPI:
         except Exception as e:
             return {"status": "error", "message": f"Server error: {str(e)}"}
 
-    async def mark_refunded(self, bounty_id):
+    async def mark_refunded(
+        self, bounty_id: int, transaction_hash: str, current_user: User
+    ):
         try:
             bounty = self.db.query(Bounty).filter(Bounty.id == bounty_id).first()
 
@@ -272,10 +275,40 @@ class OrganizationAPI:
                     "message": "Bounty already marked as refunded",
                 }
 
-            bounty.refund = True
-            self.db.commit()
+            transaction_data = {
+                "bounty_title": bounty.title,
+                "transaction_hash": transaction_hash,
+                "transaction_type": TransactionType.REFUND,
+                "transaction_status": TransactionStatus.PENDING,
+                "amount": bounty.payout_amount,
+                "user_id": current_user.id,
+            }
 
-            return {"status": "success", "message": "Bounty marked as refunded"}
+            await self.create_transaction(transaction_data=transaction_data)
+            status = await poll_transaction_status(transaction_hash)
+
+            transaction = (
+                self.db.query(Transaction)
+                .filter(Transaction.transaction_hash == transaction_hash)
+                .first()
+            )
+            if not transaction:
+                return {
+                    "status": "error",
+                    "message": "Transaction record not found after creation",
+                }
+
+            if status == "success":
+                transaction.transaction_status = TransactionStatus.SUCCESS
+
+                bounty.refund = True
+                self.db.commit()
+                return {"status": "success", "message": "Refund Successful"}
+            else:
+                transaction.transaction_status = TransactionStatus.FAILED
+                self.db.commit()
+                return {"status": "error", "message": "Transaction Failed"}
+
         except Exception as e:
             self.db.rollback()
             return {"status": "error", "message": f"Server error: {str(e)}"}

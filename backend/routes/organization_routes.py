@@ -286,10 +286,10 @@ async def get_transactions_api(
         )
 
 
-@router.post("/mark_refunded/{bounty_id}")
+@router.post("/mark_refunded")
 async def mark_refunded_api(
     request: Request,
-    bounty_id: int,
+    data: FundBountySchema,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -303,7 +303,11 @@ async def mark_refunded_api(
                 },
             )
         organization_api = OrganizationAPI(db)
-        return await organization_api.mark_refunded(bounty_id=bounty_id)
+        return await organization_api.mark_refunded(
+            bounty_id=data.bounty_id,
+            transaction_hash=data.transaction_hash,
+            current_user=current_user,
+        )
 
     except Exception as e:
         logger.error(f"Error marking as refunded {str(e)}")

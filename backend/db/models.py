@@ -27,6 +27,9 @@ class UserType(enum.Enum):
 class TransactionType(enum.Enum):
     FUND_BOUNTY = "FUND_BOUNTY"
     RECEIVE_PAYOUT = "RECEIVE_PAYOUT"
+    REFUND = "REFUND"
+    ASSIGN_BOUNTY = "ASSIGN_BOUNTY"
+    MINT_NFT = "MINT_NFT"
 
 
 class TransactionStatus(enum.Enum):

@@ -1,4 +1,13 @@
-from db.models import Bounty, BountySolution, BountyStatus
+from db.models import (
+    User,
+    Bounty,
+    BountySolution,
+    BountyStatus,
+    Transaction,
+    TransactionStatus,
+    TransactionType,
+)
+from utils.transaction_status import poll_transaction_status
 from sqlalchemy.orm import Session
 from logger import logger
 
@@ -25,22 +34,60 @@ class HunterApi:
             logger.error(f"Error fetching bounty by ID {bounty_id}: {str(e)}")
             return {"status": "error", "message": "Something went wrong"}
 
-    async def assign_bounty(self, bounty_id: int, hunter_id: int):
+    async def assign_bounty(
+        self, transaction_hash: str, bounty_id: int, hunter_id: int
+    ):
         try:
             bounty = self.db.query(Bounty).filter(Bounty.id == bounty_id).first()
             if not bounty:
                 return {"status": "error", "message": "Bounty not found"}
 
-            if bounty.status.value != "OPEN":
+            if bounty.status != BountyStatus.OPEN:
                 return {
                     "status": "error",
                     "message": "Bounty is not open for assignment",
                 }
-            bounty.assigned_to = hunter_id
-            bounty.status = "ASSIGNED"
-            self.db.commit()
-            self.db.refresh(bounty)
-            return {"status": "success", "message": "Bounty assigned successfully"}
+
+            transaction_data = {
+                "bounty_title": bounty.title,
+                "transaction_hash": transaction_hash,
+                "transaction_type": TransactionType.ASSIGN_BOUNTY,
+                "transaction_status": TransactionStatus.PENDING,
+                "amount": 0,
+                "user_id": hunter_id,
+            }
+
+            await self.create_transaction(transaction_data=transaction_data)
+            status = await poll_transaction_status(transaction_hash)
+
+            transaction = (
+                self.db.query(Transaction)
+                .filter(Transaction.transaction_hash == transaction_hash)
+                .first()
+            )
+
+            if not transaction:
+                return {
+                    "status": "error",
+                    "message": "Transaction record not found after creation",
+                }
+
+            if status == "success":
+                bounty.assigned_to = hunter_id
+                bounty.status = BountyStatus.ASSIGNED
+                transaction.transaction_status = TransactionStatus.SUCCESS
+                self.db.commit()
+                return {
+                    "status": "success",
+                    "message": "Successfully assigned bounty.",
+                }
+            else:
+                transaction.transaction_status = TransactionStatus.FAILED
+                self.db.commit()
+                return {
+                    "status": "error",
+                    "message": "Failed to assign bounty",
+                }
         except Exception as e:
             self.db.rollback()
             logger.error(
@@ -121,4 +168,63 @@ class HunterApi:
             logger.error(
                 f"Error fetching solutions count for hunter {hunter_id}: {str(e)}"
             )
+            return {"status": "error", "message": "Something went wrong"}
+
+    async def create_transaction(self, transaction_data):
+        try:
+
+            new_transaction = Transaction(**transaction_data)
+
+            self.db.add(new_transaction)
+            self.db.commit()
+            self.db.refresh(new_transaction)
+
+            return {"status": "success", "transaction": new_transaction}
+
+        except Exception as e:
+            return {"status": "error", "message": f"Server error: {str(e)}"}
+
+    async def mint_nft(self, transaction_hash: str, hunter_id: int):
+        try:
+            user = self.db.query(User).filter(User.id == hunter_id).first()
+            if not user:
+                return {"status": "error", "message": "Hunter not Found"}
+
+            transaction_data = {
+                "bounty_title": "Elite Bounty Hunter",
+                "transaction_hash": transaction_hash,
+                "transaction_type": TransactionType.MINT_NFT,
+                "transaction_status": TransactionStatus.PENDING,
+                "amount": 0,
+                "user_id": hunter_id,
+            }
+            await self.create_transaction(transaction_data=transaction_data)
+            status = await poll_transaction_status(transaction_hash)
+
+            transaction = (
+                self.db.query(Transaction)
+                .filter(Transaction.transaction_hash == transaction_hash)
+                .first()
+            )
+            if not transaction:
+                return {
+                    "status": "error",
+                    "message": "Transaction record not found after creation",
+                }
+            if status == "success":
+                transaction.transaction_status = TransactionStatus.SUCCESS
+                self.db.commit()
+                return {
+                    "status": "success",
+                    "message": "Successfully Minted NFT.",
+                }
+            else:
+                transaction.transaction_status = TransactionStatus.FAILED
+                self.db.commit()
+                return {
+                    "status": "error",
+                    "message": "NFT minting failed",
+                }
+        except Exception as e:
+            logger.error(f"Error minting NFT count for hunter {hunter_id}: {str(e)}")
             return {"status": "error", "message": "Something went wrong"}

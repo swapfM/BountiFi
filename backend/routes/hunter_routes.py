@@ -10,7 +10,11 @@ from slowapi.util import get_remote_address
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from schema.common_schema import BountyGet, BountySummary, ErrorMessage, SuccessMessage
-from schema.hunter_schema import CreateSolutionSchema
+from schema.hunter_schema import (
+    CreateSolutionSchema,
+    AssignBountySchema,
+    MintPayloadSchema,
+)
 from logger import logger
 
 router = APIRouter(prefix="/hunter", tags=["Hunter"])
@@ -70,11 +74,11 @@ async def get_bounty_by_id_api(
         )
 
 
-@router.get("/assign_bounty/{bounty_id}", response_model=SuccessMessage | ErrorMessage)
+@router.post("/assign_bounty", response_model=SuccessMessage | ErrorMessage)
 # @limiter.limit("5/minute")
 async def assign_bounty_api(
     request: Request,
-    bounty_id: int,
+    data: AssignBountySchema,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -89,7 +93,9 @@ async def assign_bounty_api(
             )
         hunter_api = HunterApi(db)
         return await hunter_api.assign_bounty(
-            bounty_id=bounty_id, hunter_id=current_user.id
+            transaction_hash=data.transaction_hash,
+            bounty_id=data.bounty_id,
+            hunter_id=current_user.id,
         )
     except Exception as e:
         logger.error(
@@ -173,6 +179,34 @@ async def get_solution_count_api(
             )
         hunter_api = HunterApi(db)
         return await hunter_api.get_solution_count(current_user.id)
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Something went wrong"},
+        )
+
+
+@router.post("/mint_nft")
+async def mint_nft_api(
+    request: Request,
+    payload: MintPayloadSchema,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        transaction_hash = payload.transactionHash
+        if current_user.user_type.value != "HUNTER":
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "status": "error",
+                    "message": "Only hunters allowed",
+                },
+            )
+        hunter_api = HunterApi(db)
+        return await hunter_api.mint_nft(
+            transaction_hash=transaction_hash, hunter_id=current_user.id
+        )
     except Exception as e:
         return JSONResponse(
             status_code=500,
