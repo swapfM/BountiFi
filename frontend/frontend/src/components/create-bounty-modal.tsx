@@ -24,7 +24,6 @@ import { MultiSelect } from "@/components/ui/multi-select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useCreateOrgBounty } from "@/hooks/useCreateOrgBounty";
 import { useAuth } from "@/context/AuthContext";
-import { useFundBounty } from "@/hooks/contracts/useFundBounty";
 import { AxiosError } from "axios";
 
 interface CreateBountyModalProps {
@@ -57,13 +56,12 @@ const techOptions = [
   "MongoDB",
 ];
 
-const currencyOptions = ["BDAG", "ETH"];
+const currencyOptions = ["BDAG"];
 
 export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
   const { mutateAsync: createBounty } = useCreateOrgBounty();
   const { accessToken: token } = useAuth();
   const [loading, setLoading] = useState(false);
-  const { fund } = useFundBounty();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -97,15 +95,8 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
     setLoading(true);
 
     try {
-      const data = await createBounty({ token, payload });
+      await createBounty({ token, payload });
       onClose();
-
-      await fund(
-        data.bounty.id,
-        data.bounty.payout_amount.toString(),
-        data.bounty.title,
-        token
-      );
 
       setFormData({
         title: "",
@@ -201,6 +192,7 @@ export function CreateBountyModal({ isOpen, onClose }: CreateBountyModalProps) {
                 id="payoutAmount"
                 type="number"
                 value={formData.payoutAmount}
+                min={0}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,

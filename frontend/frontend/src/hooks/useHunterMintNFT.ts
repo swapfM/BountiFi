@@ -4,43 +4,43 @@ import { toast } from "react-toastify";
 
 const BASE_URL = process.env.NEXT_PUBLIC_FASTAPI_HOST;
 
-interface refundPayload {
-  bountyId: number;
+interface mintPayload {
   transactionHash: string;
 }
 
-const postMarkRefund = async (token: string, payload: refundPayload) => {
+const HunterMintNFT = async ({
+  token,
+  payload,
+}: {
+  token: string;
+  payload: mintPayload;
+}) => {
   const response = await axios.post(
-    `${BASE_URL}/api/organization/mark_refunded`,
+    `${BASE_URL}/api/hunter/mint_nft`,
     payload,
     {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
       },
     }
   );
   return response.data;
 };
 
-export const useMarkRefund = () => {
+export const useHunterMintNFT = () => {
   return useMutation({
-    mutationFn: ({
-      token,
-      payload,
-    }: {
-      token: string;
-      payload: refundPayload;
-    }) => postMarkRefund(token, payload),
+    mutationFn: HunterMintNFT,
     onSuccess: (data) => {
       if (data.status === "success") {
-        toast.success(data.message || "Successfully refunded");
+        toast.success(data.message || "Successfully minted NFT");
       } else {
         toast.error(data.message || "Something went wrong");
       }
     },
     onError: (error: AxiosError) => {
-      toast.error(error.response?.status || "Network/server error occurred");
+      toast.error(
+        error.response?.statusText || "Network/server error occurred"
+      );
     },
   });
 };

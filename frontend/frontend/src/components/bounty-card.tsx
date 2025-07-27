@@ -8,9 +8,8 @@ import { SubmissionModal } from "@/components/submission-modal";
 import { BountyDetailsModal } from "@/components/bounty-details-modal";
 import { Calendar, Edit, Eye, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 import { format } from "date-fns";
-import type { BountyStatus } from "@/types/AuthTypes";
+import type { BountyStatus } from "@/types/types";
 
 interface BountyCardProps {
   bounty: {
@@ -35,6 +34,7 @@ interface BountyCardProps {
   onEdit?: () => void;
   onClaim?: () => void;
   onRefund?: () => void;
+  onFund?: () => void;
 }
 
 export function BountyCard({
@@ -44,11 +44,13 @@ export function BountyCard({
   onEdit,
   onClaim,
   onRefund,
+  onFund,
 }: BountyCardProps) {
   const [submissionOpen, setSubmissionOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   const statusColors = {
+    UNFUNDED: "bg-red-500/20 text-red-400 border-red-500/30",
     OPEN: "bg-neon-green/20 text-neon-green border-neon-green/30",
     ASSIGNED: "bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30",
     IN_REVIEW: "bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30",
@@ -68,18 +70,18 @@ export function BountyCard({
   const handleAssignBounty = () => {
     if (onClaim) {
       onClaim();
-      toast("Bounty Claimed Successfully! ", {
-        description: `You've claimed "${bounty.title}". Check your My Tasks tab to start working on it.`,
-      });
     }
   };
 
   const handleRefund = () => {
     if (onRefund) {
       onRefund();
-      toast.info("Refund Requested", {
-        description: `Refund for "${bounty.title}" submitted. You'll receive ${bounty.payoutCurrency} ${bounty.payoutAmount}`,
-      });
+    }
+  };
+
+  const handleFundBounty = () => {
+    if (onFund) {
+      onFund();
     }
   };
 
@@ -216,6 +218,19 @@ export function BountyCard({
                   )}
                 >
                   Submit Solution
+                </Button>
+              )}
+
+              {userType == "ORGANIZATION" && bounty.status === "UNFUNDED" && (
+                <Button
+                  size="sm"
+                  onClick={() => handleFundBounty()}
+                  className={cn(
+                    "bg-neon-blue hover:bg-neon-blue/80 text-black font-semibold",
+                    "neon-glow"
+                  )}
+                >
+                  Fund Bounty
                 </Button>
               )}
 

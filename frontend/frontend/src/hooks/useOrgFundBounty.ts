@@ -1,22 +1,19 @@
 import { useMutation } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
 const BASE_URL = process.env.NEXT_PUBLIC_FASTAPI_HOST;
 
-interface approvePayload {
-  bountyId: number;
+interface fundPayload {
   transactionHash: string;
-  submissionId: number;
+  bountyId: number;
 }
 
-const postOrgApproveSubmission = async (
-  token: string,
-  payload: approvePayload
-) => {
+const postFundBounty = async (token: string, payload: fundPayload) => {
   const response = await axios.post(
-    `${BASE_URL}/api/organization/approve_submission/${payload.submissionId}`,
-    { transactionHash: payload.transactionHash, bountyId: payload.bountyId },
+    `${BASE_URL}/api/organization/fund_bounty`,
+    payload,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -27,18 +24,14 @@ const postOrgApproveSubmission = async (
   return response.data;
 };
 
-export const useOrgApproveSubmission = () => {
+export const useOrgFundBounty = () => {
   return useMutation({
-    mutationFn: ({
-      token,
-      payload,
-    }: {
-      token: string;
-      payload: approvePayload;
-    }) => postOrgApproveSubmission(token, payload),
+    mutationFn: ({ token, payload }: { token: string; payload: fundPayload }) =>
+      postFundBounty(token, payload),
+
     onSuccess: (data) => {
       if (data.status === "success") {
-        toast.success(data.message || "Approved and paid hunter");
+        toast.success(data.message || "Successfully funded bounty");
       } else {
         toast.error(data.message || "Something went wrong");
       }

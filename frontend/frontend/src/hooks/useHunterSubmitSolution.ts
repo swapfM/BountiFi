@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 const BASE_URL = process.env.NEXT_PUBLIC_FASTAPI_HOST;
 
@@ -32,5 +33,15 @@ export const useHunterSubmitSolution = () => {
       token: string;
       payload: SolutionPayload;
     }) => postSubmitSolution(token, payload),
+    onSuccess: (data) => {
+      if (data.status === "success") {
+        toast.success(data.message || "Successfully submitted solution");
+      } else {
+        toast.error(data.message || "Something went wrong");
+      }
+    },
+    onError: (error: AxiosError) => {
+      toast.error(error.response?.status || "Network/server error occurred");
+    },
   });
 };

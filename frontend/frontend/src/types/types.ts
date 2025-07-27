@@ -11,8 +11,21 @@ export type SignupPayload = {
 };
 
 export type BountyStatus =
+  | "UNFUNDED"
   | "OPEN"
   | "ASSIGNED"
   | "IN_REVIEW"
   | "COMPLETED"
   | "EXPIRED";
+
+export type bountySummary = {
+  id: number;
+  title: string;
+  description: string;
+  techStack: string[];
+  payoutAmount: number;
+  payoutCurrency: string;
+  status: BountyStatus;
+  deadline: Date;
+  refund?: boolean;
+};

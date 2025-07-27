@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { DatePicker } from "@/components/ui/date-picker";
-import { toast } from "sonner";
 
 interface BountyDetails {
   id: number;
@@ -104,10 +103,6 @@ export function EditBountyModal({
     setLoading(true);
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    toast("Bounty Updated Successfully", {
-      description: "Your bounty has been updated with the new information.",
-    });
 
     setLoading(false);
     onClose();

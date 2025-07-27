@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { Toaster } from "@/components/ui/sonner";
+// import { Toaster } from "@/components/ui/sonner";
+import { ToastContainer } from "react-toastify";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -15,8 +16,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BlockDAG Starter Kit",
-  description: "A starter kit for building on BlockDAG",
+  title: "BountiFi",
+  description: "Bounty Hunting Platform",
 };
 
 export default function RootLayout({
@@ -30,7 +31,7 @@ export default function RootLayout({
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans bg-primary text-foreground antialiased overflow-x-hidden`}
       >
         <Providers>{children}</Providers>
-        <Toaster position="top-center" richColors />
+        <ToastContainer position="top-center" />
       </body>
     </html>
   );

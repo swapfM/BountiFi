@@ -10,6 +10,7 @@ import { useGetHunterSolutionCount } from "@/hooks/useGetHunterSolutionCount";
 import { useAuth } from "@/context/AuthContext";
 import { HunterLayout } from "@/components/hunter-layout";
 import { useMintNFT } from "@/hooks/contracts/useMintNFT";
+import { useHunterMintNFT } from "@/hooks/useHunterMintNFT";
 
 const availableRewards = [
   {
@@ -29,6 +30,7 @@ export default function RewardsPage() {
   const { accessToken } = useAuth();
   const { data } = useGetHunterSolutionCount(accessToken ?? "");
   const { mintNFT } = useMintNFT();
+  const { mutate } = useHunterMintNFT();
 
   useEffect(() => {
     if (data && typeof data.count === "number") {
@@ -40,7 +42,9 @@ export default function RewardsPage() {
   const handleMintNFT = async (rewardId: string) => {
     setMinting(rewardId);
     try {
-      mintNFT();
+      const hash = await mintNFT();
+      const payload = { transactionHash: hash };
+      mutate({ token: accessToken ?? "", payload: payload });
     } catch (error) {
       throw error;
     } finally {

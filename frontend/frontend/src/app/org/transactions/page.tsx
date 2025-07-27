@@ -22,11 +22,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  ArrowDownLeft,
   Search,
   ExternalLink,
   Copy,
   ArrowUpRight,
+  HandCoins,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGetTransactions } from "@/hooks/useGetTransactions";
@@ -57,9 +57,14 @@ const getStatusColor = (status: string) => {
 };
 
 const getTypeIcon = (type: string) => {
-  if (type == "FUND_BOUNTY") {
+  if (type == "FUND_BOUNTY")
     return <ArrowUpRight className="w-4 h-4 text-neon-green" />;
-  } else return <ArrowDownLeft className="w-4 h-4 text-neon-green" />;
+  else return <HandCoins className="w-4 h-4 text-neon-green" />;
+};
+
+const getTypeText = (type: string) => {
+  if (type == "FUND_BOUNTY") return "Funding Bounty";
+  else return "Refund";
 };
 
 const formatTime = (timeString: string) => {
@@ -199,9 +204,7 @@ export default function TransactionsPage() {
                       <div className="flex items-center space-x-2">
                         {getTypeIcon(transaction.transactionType)}
                         <span className="font-medium">
-                          {transaction.transactionType == "FUND_BOUNTY"
-                            ? "Funding Bounty"
-                            : "Receive Payout"}
+                          {getTypeText(transaction.transactionType)}
                         </span>
                       </div>
                     </TableCell>

@@ -9,7 +9,7 @@ import { useHunterAssignBounty } from "@/hooks/useHunterAssignBounty";
 import { useAuth } from "@/context/AuthContext";
 import { useGetHunterAssignedBounties } from "@/hooks/useGetHunterAssignedBounties";
 import { useAssignHunter } from "@/hooks/contracts/useAssignHunter";
-import { BountyStatus } from "@/types/AuthTypes";
+import { BountyStatus } from "@/types/types";
 
 interface bountySummary {
   id: number;
@@ -53,24 +53,11 @@ export default function HunterDashboard() {
     }
   }, [assignedBountiesData]);
 
-  const handleClaimBounty = (bountyId: number) => {
-    claimBounty(
-      { token: accessToken ?? "", bountyId },
-      {
-        onSuccess: () => {
-          setOpenBounties((prev) => prev.filter((b) => b.id !== bountyId));
-          assign(bountyId);
-
-          const claimed = openBounties.find((b) => b.id === bountyId);
-          if (claimed) {
-            setMyTasks((prev) => [...prev, claimed]);
-          }
-        },
-        onError: (error) => {
-          throw error;
-        },
-      }
-    );
+  const handleClaimBounty = async (bountyId: number) => {
+    const hash = await assign(bountyId);
+    if (!hash) return;
+    const payload = { transactionHash: hash, bountyId: bountyId };
+    claimBounty({ token: accessToken ?? "", payload: payload });
   };
 
   return (

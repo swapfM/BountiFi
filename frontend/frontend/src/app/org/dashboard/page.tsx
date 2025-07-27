@@ -8,8 +8,11 @@ import { EditBountyModal } from "@/components/edit-bounty-modal";
 import { useGetOrgBounties } from "@/hooks/useGetOrgBounties";
 import { useAuth } from "@/context/AuthContext";
 import { useLoader } from "@/hooks/useLoader";
-import { BountyStatus } from "@/types/AuthTypes";
+import { BountyStatus } from "@/types/types";
 import { useMarkRefund } from "@/hooks/useMarkRefund";
+import { useFundBounty } from "@/hooks/contracts/useFundBounty";
+import { useOrgFundBounty } from "@/hooks/useOrgFundBounty";
+import { useRefundBounty } from "@/hooks/contracts/useRefundBounty";
 
 interface bountySummary {
   id: number;
@@ -34,6 +37,9 @@ export default function OrgDashboard() {
     color: "blue",
   });
   const { mutate } = useMarkRefund();
+  const { mutate: fundMutate } = useOrgFundBounty();
+  const { fund } = useFundBounty();
+  const { refund } = useRefundBounty();
 
   const { data } = useGetOrgBounties(token ?? "");
 
@@ -47,8 +53,20 @@ export default function OrgDashboard() {
     return <Loader />;
   }
 
-  const handleRefundBounty = (bounty_id: number) => {
-    mutate({ token: token ?? "", bounty_id: bounty_id });
+  const handleRefundBounty = async (bounty_id: number) => {
+    const hash = await refund(bounty_id);
+    if (!hash) return;
+    const payload = { transactionHash: hash, bountyId: bounty_id };
+    mutate({ token: token ?? "", payload: payload });
+  };
+
+  const handleFundBounty = async (bounty: bountySummary) => {
+    const hash = await fund(bounty.id, bounty.payoutAmount);
+    const payload = { transactionHash: hash, bountyId: bounty.id };
+    fundMutate({
+      token: token ?? "",
+      payload: payload,
+    });
   };
 
   return (
@@ -79,6 +97,7 @@ export default function OrgDashboard() {
               userType="ORGANIZATION"
               onEdit={() => setEditBounty(bounty)}
               onRefund={() => handleRefundBounty(bounty.id)}
+              onFund={() => handleFundBounty(bounty)}
             />
           ))}
         </div>

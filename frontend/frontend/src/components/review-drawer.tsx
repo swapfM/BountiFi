@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Calendar, CheckCircle, XCircle } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+
 import { useAuth } from "@/context/AuthContext";
 import { useOrgApproveSubmission } from "@/hooks/useOrgApproveSubmission";
 import { useApproveSolution } from "@/hooks/contracts/useApproveSolution";
@@ -44,7 +44,7 @@ export function ReviewDrawer({
 }: ReviewDrawerProps) {
   const [reviewNotes, setReviewNotes] = useState("");
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+
   const { accessToken } = useAuth();
   const { mutate: approveSubmission } = useOrgApproveSubmission();
   const { approve } = useApproveSolution();
@@ -52,16 +52,15 @@ export function ReviewDrawer({
   const handleApprove = async () => {
     if (!submission) return;
     setLoading(true);
-    approve(
-      submission.bountyId,
-      submission.payoutAmount,
-      submission.bountyTitle,
-      submission.hunterId,
-      accessToken ?? ""
-    );
+    const hash = await approve(submission.bountyId);
+    const payload = {
+      transactionHash: hash,
+      bountyId: submission.bountyId,
+      submissionId: submission.solutionId,
+    };
     approveSubmission({
       token: accessToken ?? "",
-      submissionId: submission.solutionId,
+      payload: payload,
     });
 
     setLoading(false);
@@ -72,12 +71,12 @@ export function ReviewDrawer({
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    toast({
-      title: "Submission Rejected",
-      description:
-        "The hunter has been notified and can resubmit with improvements.",
-      variant: "destructive",
-    });
+    // toast({
+    //   title: "Submission Rejected",
+    //   description:
+    //     "The hunter has been notified and can resubmit with improvements.",
+    //   variant: "destructive",
+    // });
 
     setLoading(false);
     onClose();

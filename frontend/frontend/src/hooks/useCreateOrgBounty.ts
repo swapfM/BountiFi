@@ -1,5 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
 const BASE_URL = process.env.NEXT_PUBLIC_FASTAPI_HOST;
 
@@ -38,5 +40,15 @@ export const useCreateOrgBounty = () => {
       token: string;
       payload: BountyPayload;
     }) => postCreateBounty(token, payload),
+    onSuccess: (data) => {
+      if (data.status === "success") {
+        toast.success(data.message || "Success");
+      } else {
+        toast.error(data.message || "Something went wrong");
+      }
+    },
+    onError: (error: AxiosError) => {
+      toast.error(error.response?.status || "Network/server error occurred");
+    },
   });
 };

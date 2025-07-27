@@ -7,12 +7,11 @@ import {
 const tokenURI = process.env.NEXT_PUBLIC_NFT_TOKEN_URI;
 
 export function useMintNFT() {
-  const { writeContractAsync, isPending, error } = useWriteContract();
+  const { writeContractAsync } = useWriteContract();
 
   const mintNFT = async () => {
-    let txHash: `0x${string}` | null = null;
     try {
-      txHash = await writeContractAsync({
+      const txHash = await writeContractAsync({
         address: BOUNTIFI_BADGE_CONTRACT_ADDRESS,
         abi: BOUNTIFI_BADGE_ABI,
         functionName: "safeMint",
@@ -26,5 +25,5 @@ export function useMintNFT() {
     }
   };
 
-  return { mintNFT, isPending, error };
+  return { mintNFT };
 }
